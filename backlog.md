@@ -62,5 +62,13 @@
 - [x] SPRINT-10.4: Update Web UI to display standalone high-clarity plate JPGs alongside violation snapshots and show full plate formats
 - [x] SPRINT-10.5: Local pipeline verification, test suite execution, and walkthrough update
 
+## SPRINT-11: Ego-Compensated Road-Aware Wrong-Way Vehicle Enforcement
+- [x] SPRINT-11.1: Dynamic Corridor & Homography Engine (`src/violations/road_segmenter.py`)
+- [x] SPRINT-11.2: Vehicle Orientation Classifier & Temporal Smoother (`src/violations/orientation_classifier.py`)
+- [x] SPRINT-11.3: Sparse Optical Flow Ego-Motion & Kinematics Engine (`src/violations/kinematics.py`)
+- [x] SPRINT-11.4: Hysteresis State Machine & Pipeline Integration (`src/violations/state_machine.py`, `run_violation_pipeline.py`)
+- [x] SPRINT-11.5: Benchmark & Regression Suite (`tests/test_wrongway_detector.py`)
+
+
 
 
