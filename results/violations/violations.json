@@ -1,0 +1,110 @@
+{
+  "video": "wrongway_motion_raw.mp4",
+  "total_frames": 572,
+  "duration_sec": 38.17,
+  "total_violations_detected": 6,
+  "violations": [
+    {
+      "track_id": 1,
+      "type": "WRONG_WAY_DRIVING",
+      "vehicle_type": "Car",
+      "first_detected_frame": 27,
+      "first_detected_time_sec": 1.8,
+      "last_frame": 82,
+      "last_time_sec": 5.47,
+      "confidence": 0.801,
+      "bbox_sample": [
+        810,
+        388,
+        1010,
+        542
+      ],
+      "duration_sec": 3.67
+    },
+    {
+      "track_id": 14,
+      "type": "WRONG_WAY_DRIVING",
+      "vehicle_type": "Car",
+      "first_detected_frame": 48,
+      "first_detected_time_sec": 3.2,
+      "last_frame": 53,
+      "last_time_sec": 3.54,
+      "confidence": 0.613,
+      "bbox_sample": [
+        1033,
+        328,
+        1230,
+        678
+      ],
+      "duration_sec": 0.34
+    },
+    {
+      "track_id": 19,
+      "type": "WRONG_WAY_DRIVING",
+      "vehicle_type": "Car",
+      "first_detected_frame": 77,
+      "first_detected_time_sec": 5.14,
+      "last_frame": 105,
+      "last_time_sec": 7.01,
+      "confidence": 0.86,
+      "bbox_sample": [
+        818,
+        389,
+        1031,
+        547
+      ],
+      "duration_sec": 1.87
+    },
+    {
+      "track_id": 23,
+      "type": "WRONG_WAY_DRIVING",
+      "vehicle_type": "Car",
+      "first_detected_frame": 103,
+      "first_detected_time_sec": 6.87,
+      "last_frame": 572,
+      "last_time_sec": 38.17,
+      "confidence": 0.812,
+      "bbox_sample": [
+        996,
+        371,
+        1214,
+        678
+      ],
+      "duration_sec": 31.3
+    },
+    {
+      "track_id": 2,
+      "type": "WRONG_WAY_DRIVING",
+      "vehicle_type": "Truck",
+      "first_detected_frame": 144,
+      "first_detected_time_sec": 9.61,
+      "last_frame": 160,
+      "last_time_sec": 10.68,
+      "confidence": 0.734,
+      "bbox_sample": [
+        146,
+        157,
+        507,
+        576
+      ],
+      "duration_sec": 1.07
+    },
+    {
+      "track_id": 73,
+      "type": "WRONG_WAY_DRIVING",
+      "vehicle_type": "Truck",
+      "first_detected_frame": 221,
+      "first_detected_time_sec": 14.75,
+      "last_frame": 243,
+      "last_time_sec": 16.22,
+      "confidence": 0.924,
+      "bbox_sample": [
+        176,
+        256,
+        506,
+        544
+      ],
+      "duration_sec": 1.47
+    }
+  ]
+}

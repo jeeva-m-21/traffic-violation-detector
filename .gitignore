@@ -19,6 +19,8 @@ data/
 *.pt
 *.pth
 *.onnx
+*.mp4
+*.avi
 runs/
 cache/
 

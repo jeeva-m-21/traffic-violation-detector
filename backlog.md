@@ -14,3 +14,10 @@
 - [x] SPRINT-3.2: Run full inference and map classes to COCO standard format (`xywh`)
 - [x] SPRINT-3.3: Evaluate metrics using pycocotools (mAP50: 0.6313, mAP50-95: 0.4763, per-class AP) and vehicle count MAE (1.205)
 - [x] SPRINT-3.4: Save all output artifacts (metrics.json, detections.json, per_image_counts.csv, report.md) locally and on Colab
+
+## SPRINT-4: Traffic Violation Pipeline on Dashcam Video
+- [x] SPRINT-4.1: Video ingestion & Colab GPU provisioning with auto-stop wrapper
+- [x] SPRINT-4.2: Multi-object vehicle tracking pipeline (YOLO11 + ByteTrack)
+- [x] SPRINT-4.3: Wrong-way motion vector classification & violation alert engine
+- [x] SPRINT-4.4: Render annotated video with trajectory overlays, HUD, and export `violations.json`
+- [x] SPRINT-4.5: Download annotated video and violation log locally, verify Colab session shutdown
