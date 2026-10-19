@@ -1,0 +1,24 @@
+{
+  "hardware": "13th Gen Intel Core i5-1335U (CPU)",
+  "input_video": "/home/jeeva/Downloads/test_clip_5s.mp4",
+  "frames_processed": 152,
+  "elapsed_time_sec": 23.18,
+  "fps": 6.56,
+  "violations_detected": 1,
+  "violations": [
+    {
+      "rider_id": 16,
+      "motorcycle_id": 23,
+      "first_seen_sec": 1.73,
+      "violation_type": "NO_HELMET",
+      "plate_number": "01-H9",
+      "sample_bbox": [
+        505,
+        256,
+        732,
+        514
+      ],
+      "plate_confidence": 0.611
+    }
+  ]
+}
