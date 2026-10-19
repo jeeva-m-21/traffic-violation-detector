@@ -1,0 +1,72 @@
+{
+  "video": "/content/helmet_riders_clean.mp4",
+  "total_frames": 1693,
+  "fps": 30.0,
+  "duration_sec": 56.43,
+  "elapsed_time_sec": 61.74,
+  "avg_fps": 27.4,
+  "total_riders_tracked": 28,
+  "total_motorcycles_tracked": 15,
+  "compliant_riders": 25,
+  "violations_detected": 3,
+  "plates_extracted": 3,
+  "incidents": [
+    {
+      "incident_id": "INC-001",
+      "rider_id": 70,
+      "motorcycle_id": 71,
+      "timestamp_sec": 31.97,
+      "last_seen_sec": 34.2,
+      "violation_type": "NO_HELMET",
+      "helmet_confidence": 0.462,
+      "plate_number": "8703",
+      "plate_confidence": 0.249,
+      "status": "CONFIRMED",
+      "snapshot_path": "/static/snapshots/INC-001.jpg",
+      "sample_bbox": [
+        519,
+        216,
+        709,
+        464
+      ]
+    },
+    {
+      "incident_id": "INC-002",
+      "rider_id": 109,
+      "motorcycle_id": 110,
+      "timestamp_sec": 45.23,
+      "last_seen_sec": 45.3,
+      "violation_type": "NO_HELMET",
+      "helmet_confidence": 0.588,
+      "plate_number": "9495",
+      "plate_confidence": 0.345,
+      "status": "CONFIRMED",
+      "snapshot_path": "/static/snapshots/INC-002.jpg",
+      "sample_bbox": [
+        375,
+        235,
+        573,
+        499
+      ]
+    },
+    {
+      "incident_id": "INC-003",
+      "rider_id": 112,
+      "motorcycle_id": 113,
+      "timestamp_sec": 50.53,
+      "last_seen_sec": 56.43,
+      "violation_type": "NO_HELMET",
+      "helmet_confidence": 0.716,
+      "plate_number": "06216",
+      "plate_confidence": 0.166,
+      "status": "CONFIRMED",
+      "snapshot_path": "/static/snapshots/INC-003.jpg",
+      "sample_bbox": [
+        1,
+        293,
+        213,
+        519
+      ]
+    }
+  ]
+}

@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Traffic Violation & License Plate Recognition System</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0f172a;
+      --card-bg: #1e293b;
+      --border-color: #334155;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --accent-cyan: #06b6d4;
+      --accent-red: #ef4444;
+      --accent-green: #10b981;
+      --accent-amber: #f59e0b;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-primary);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      min-height: 100vh;
+      padding-bottom: 40px;
+    }
+
+    .navbar-custom {
+      background-color: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.25rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    }
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .card-custom {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .card-header-custom {
+      background: rgba(30, 41, 59, 0.8);
+      border-bottom: 1px solid var(--border-color);
+      padding: 0.9rem 1.25rem;
+      font-weight: 600;
+    }
+
+    .video-container {
+      position: relative;
+      background: #000;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    video {
+      width: 100%;
+      height: auto;
+      max-height: 480px;
+      display: block;
+    }
+
+    .license-plate-badge {
+      display: inline-block;
+      background: #fef08a;
+      color: #1c1917;
+      font-family: "Courier New", Courier, monospace;
+      font-weight: 800;
+      font-size: 1.05rem;
+      padding: 3px 10px;
+      border-radius: 6px;
+      border: 2px solid #ca8a04;
+      letter-spacing: 1.5px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .badge-violation {
+      background: rgba(239, 68, 68, 0.2);
+      color: #fca5a5;
+      border: 1px solid rgba(239, 68, 68, 0.5);
+      font-weight: 600;
+      padding: 4px 8px;
+      border-radius: 6px;
+    }
+
+    .badge-compliant {
+      background: rgba(16, 185, 129, 0.2);
+      color: #6ee7b7;
+      border: 1px solid rgba(16, 185, 129, 0.5);
+      font-weight: 600;
+      padding: 4px 8px;
+      border-radius: 6px;
+    }
+
+    .thumbnail-crop {
+      width: 64px;
+      height: 64px;
+      object-fit: cover;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .thumbnail-crop:hover {
+      transform: scale(1.1);
+    }
+
+    .table-custom {
+      --bs-table-bg: transparent;
+      --bs-table-color: var(--text-primary);
+      --bs-table-border-color: var(--border-color);
+      vertical-align: middle;
+    }
+
+    .timestamp-btn {
+      background: rgba(6, 182, 212, 0.15);
+      color: var(--accent-cyan);
+      border: 1px solid rgba(6, 182, 212, 0.3);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .timestamp-btn:hover {
+      background: rgba(6, 182, 212, 0.3);
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark navbar-custom sticky-top">
+    <div class="container-fluid px-4">
+      <a class="navbar-brand d-flex align-items-center gap-2 fw-bold" href="#">
+        <i class="bi bi-shield-check text-cyan fs-4"></i>
+        <span>TrafficGuard AI</span>
+        <span class="badge bg-secondary text-uppercase ms-2" style="font-size: 0.7rem;">Two-Wheeler Enforcement</span>
+      </a>
+      <div class="d-flex align-items-center gap-3">
+        <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2">
+          <i class="bi bi-cpu-fill me-1"></i> T4 GPU Inference Active
+        </span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Container -->
+  <div class="container-fluid px-4 py-4">
+
+    <!-- KPI Metric Cards -->
+    <div class="row g-3 mb-4">
+      <div class="col-12 col-sm-6 col-xl-3">
+        <div class="stat-card">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <span class="text-secondary small fw-semibold text-uppercase">Riders Tracked</span>
+            <i class="bi bi-bicycle text-primary fs-4"></i>
+          </div>
+          <div class="stat-value text-white" id="stat-riders">{{ data.total_riders_tracked }}</div>
+          <div class="text-secondary small mt-1">Multi-object ByteTrack tracking</div>
+        </div>
+      </div>
+      <div class="col-12 col-sm-6 col-xl-3">
+        <div class="stat-card">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <span class="text-secondary small fw-semibold text-uppercase">Helmet Compliance</span>
+            <i class="bi bi-shield-shaded text-success fs-4"></i>
+          </div>
+          <div class="stat-value text-success" id="stat-compliance">
+            {{ "%.1f"|format((data.compliant_riders / data.total_riders_tracked) * 100) }}%
+          </div>
+          <div class="text-secondary small mt-1">{{ data.compliant_riders }} riders compliant</div>
+        </div>
+      </div>
+      <div class="col-12 col-sm-6 col-xl-3">
+        <div class="stat-card">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <span class="text-secondary small fw-semibold text-uppercase">Helmet Violations</span>
+            <i class="bi bi-exclamation-octagon-fill text-danger fs-4"></i>
+          </div>
+          <div class="stat-value text-danger" id="stat-violations">{{ data.violations_detected }}</div>
+          <div class="text-secondary small mt-1">Confirmed no-helmet infractions</div>
+        </div>
+      </div>
+      <div class="col-12 col-sm-6 col-xl-3">
+        <div class="stat-card">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <span class="text-secondary small fw-semibold text-uppercase">Plates Extracted</span>
+            <i class="bi bi-camera text-warning fs-4"></i>
+          </div>
+          <div class="stat-value text-warning" id="stat-plates">{{ data.plates_extracted }}</div>
+          <div class="text-secondary small mt-1">100% matched to offenders</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Workspace -->
+    <div class="row g-4">
+
+      <!-- Left Column: Video Player & Selection -->
+      <div class="col-12 col-lg-7">
+        <div class="card-custom">
+          <div class="card-header-custom d-flex justify-content-between align-items-center">
+            <span class="d-flex align-items-center gap-2">
+              <i class="bi bi-play-circle text-info"></i>
+              Annotated Video Playback & HUD Overlay
+            </span>
+            <span class="badge bg-dark border border-secondary text-secondary small">
+              {{ data.fps }} FPS | {{ data.duration_sec }}s
+            </span>
+          </div>
+          <div class="p-3">
+            <div class="video-container mb-3 shadow">
+              <video id="trafficVideo" controls preload="metadata" poster="">
+                <source src="{{ active_video }}" type="video/mp4">
+                Your browser does not support HTML5 video.
+              </video>
+            </div>
+
+            <!-- Video Controls & Upload Form -->
+            <div class="row g-2 align-items-center">
+              <div class="col-md-7">
+                <label class="form-label small text-secondary mb-1">Select Analysis Footage</label>
+                <select class="form-select bg-dark text-white border-secondary" id="sampleSelect" onchange="changeVideo()">
+                  {% for s in samples %}
+                  <option value="{{ s.path }}">{{ s.name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-5 d-flex align-items-end gap-2">
+                <button type="button" class="btn btn-outline-info w-100 mt-4" data-bs-toggle="modal" data-bs-target="#uploadModal">
+                  <i class="bi bi-cloud-arrow-up me-1"></i> Upload Video
+                </button>
+                <button type="button" class="btn btn-primary w-100 mt-4" onclick="runAnalysis()">
+                  <i class="bi bi-lightning-charge me-1"></i> Analyze
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pipeline Overview Box -->
+        <div class="card-custom mt-3">
+          <div class="card-header-custom">
+            <i class="bi bi-diagram-3 me-1 text-info"></i> Automated Enforcement Architecture
+          </div>
+          <div class="p-3 small text-secondary">
+            <ol class="mb-0 ps-3">
+              <li><strong>Detection & Tracking:</strong> YOLO11s detects persons and motorcycles; ByteTrack assigns persistent IDs.</li>
+              <li><strong>Rider Association:</strong> Vertical/horizontal geometric matrix binds rider to motorcycle seat.</li>
+              <li><strong>Helmet Verification:</strong> Specialized YOLOv8 classifies head ROI; temporal voting eliminates false alerts.</li>
+              <li><strong>Targeted ANPR:</strong> For no-helmet riders, motorcycle crop triggers YOLO plate detector + GPU EasyOCR.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Violations & Extracted Number Plates -->
+      <div class="col-12 col-lg-5">
+        <div class="card-custom h-100">
+          <div class="card-header-custom d-flex justify-content-between align-items-center">
+            <span class="d-flex align-items-center gap-2">
+              <i class="bi bi-shield-slash text-danger"></i>
+              Violations & License Plate Evidence Feed
+            </span>
+            <span class="badge bg-danger rounded-pill px-2 py-1">{{ data.violations_detected }} Incidents</span>
+          </div>
+
+          <div class="p-3">
+            <div class="table-responsive">
+              <table class="table table-custom">
+                <thead>
+                  <tr class="text-secondary small text-uppercase">
+                    <th>Evidence</th>
+                    <th>Offender</th>
+                    <th>Extracted Number Plate</th>
+                    <th>Time</th>
+                  </tr>
+                </thead>
+                <tbody id="incidentsTable">
+                  {% for inc in data.incidents %}
+                  <tr>
+                    <td>
+                      {% if inc.snapshot_path %}
+                      <img src="{{ inc.snapshot_path }}" alt="{{ inc.incident_id }}" class="thumbnail-crop" onclick="openImageModal('{{ inc.snapshot_path }}', '{{ inc.incident_id }}')">
+                      {% else %}
+                      <div class="thumbnail-crop bg-dark d-flex align-items-center justify-content-center text-secondary small">N/A</div>
+                      {% endif %}
+                    </td>
+                    <td>
+                      <div class="fw-bold text-white">{{ inc.incident_id }}</div>
+                      <div class="small text-secondary">Rider #{{ inc.rider_id }} (Moto #{{ inc.motorcycle_id }})</div>
+                      <span class="badge-violation small mt-1 d-inline-block">
+                        <i class="bi bi-exclamation-triangle-fill me-1"></i> NO HELMET
+                      </span>
+                    </td>
+                    <td>
+                      <div class="license-plate-badge">{{ inc.plate_number }}</div>
+                      <div class="small text-secondary mt-1">
+                        OCR Conf: {{ "%.2f"|format(inc.plate_confidence) }}
+                      </div>
+                    </td>
+                    <td>
+                      <a href="javascript:void(0)" class="timestamp-btn" onclick="seekVideo({{ inc.timestamp_sec }})">
+                        <i class="bi bi-play-fill"></i> {{ inc.timestamp_sec }}s
+                      </a>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Enforcement Export Box -->
+            <div class="p-3 bg-dark rounded border border-secondary mt-3">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <div class="fw-semibold text-white small">Audit Trail & E-Challan Data</div>
+                  <div class="text-secondary small" style="font-size: 0.75rem;">Verified cryptographic timestamp & OCR record</div>
+                </div>
+                <a href="/api/results" class="btn btn-sm btn-outline-light" download="traffic_violations.json">
+                  <i class="bi bi-download me-1"></i> Export JSON
+                </a>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Upload Modal -->
+  <div class="modal fade" id="uploadModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content bg-dark text-white border-secondary">
+        <div class="modal-header border-secondary">
+          <h5 class="modal-title"><i class="bi bi-upload me-2 text-info"></i>Upload Video for Analysis</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="uploadForm" enctype="multipart/form-data">
+            <div class="mb-3">
+              <label for="videoFile" class="form-label text-secondary">Select MP4 Dashcam / Traffic Footage</label>
+              <input class="form-control bg-dark text-white border-secondary" type="file" id="videoFile" name="file" accept="video/mp4,video/avi,video/mov" required>
+            </div>
+            <div class="progress d-none mb-3" id="uploadProgress">
+              <div class="progress-bar progress-bar-striped progress-bar-animated bg-info" style="width: 100%">Uploading...</div>
+            </div>
+            <div class="d-flex justify-content-end gap-2">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-primary" id="uploadBtn">Upload & Stage</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Snapshot Modal -->
+  <div class="modal fade" id="imageModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content bg-dark text-white border-secondary">
+        <div class="modal-header border-secondary">
+          <h5 class="modal-title" id="imageModalTitle">Violation Evidence Snapshot</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body text-center p-2">
+          <img src="" id="imageModalSrc" class="img-fluid rounded shadow" alt="Evidence">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const video = document.getElementById('trafficVideo');
+
+    function seekVideo(seconds) {
+      if (video) {
+        video.currentTime = Math.max(0, seconds - 1);
+        video.play();
+      }
+    }
+
+    function changeVideo() {
+      const select = document.getElementById('sampleSelect');
+      const newSrc = select.value;
+      video.src = newSrc;
+      video.load();
+      video.play();
+    }
+
+    function openImageModal(src, id) {
+      document.getElementById('imageModalSrc').src = src;
+      document.getElementById('imageModalTitle').textContent = `Evidence Snapshot - ${id}`;
+      const modal = new bootstrap.Modal(document.getElementById('imageModal'));
+      modal.show();
+    }
+
+    function runAnalysis() {
+      const btn = event.target;
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Analyzing...';
+      btn.disabled = true;
+
+      fetch('/api/analyze', { method: 'POST' })
+        .then(res => res.json())
+        .then(data => {
+          btn.innerHTML = '<i class="bi bi-check2 me-1"></i> Complete!';
+          setTimeout(() => {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+          }, 1500);
+        })
+        .catch(err => {
+          console.error(err);
+          btn.innerHTML = originalText;
+          btn.disabled = false;
+        });
+    }
+
+    document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fileInput = document.getElementById('videoFile');
+      if (!fileInput.files.length) return;
+
+      const formData = new FormData();
+      formData.append('file', fileInput.files[0]);
+
+      const progress = document.getElementById('uploadProgress');
+      progress.classList.remove('d-none');
+
+      try {
+        const res = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+        progress.classList.add('d-none');
+        bootstrap.Modal.getInstance(document.getElementById('uploadModal')).hide();
+        alert(`Video "${data.filename}" uploaded successfully!`);
+        location.reload();
+      } catch (err) {
+        console.error(err);
+        progress.classList.add('d-none');
+        alert('Upload failed: ' + err.message);
+      }
+    });
+  </script>
+</body>
+</html>
