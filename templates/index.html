@@ -3,128 +3,149 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI Traffic Violation & License Plate Recognition System</title>
+  <title>TRAFFIC-GUARD // AI Traffic Surveillance & ANPR Platform</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
   <style>
     :root {
-      --bg-dark: #0f172a;
-      --card-bg: #1e293b;
-      --border-color: #334155;
-      --text-primary: #f8fafc;
-      --text-secondary: #94a3b8;
-      --accent-cyan: #06b6d4;
-      --accent-red: #ef4444;
-      --accent-green: #10b981;
-      --accent-amber: #f59e0b;
+      --bg-space: #070a13;
+      --bg-surface: #0e1626;
+      --bg-card: #141f36;
+      --bg-card-hover: #1a2845;
+      --border-subtle: #233354;
+      --border-accent: #0284c7;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --cyan-glow: #06b6d4;
+      --red-alert: #ef4444;
+      --green-safe: #10b981;
+      --amber-warn: #f59e0b;
     }
 
     body {
-      background-color: var(--bg-dark);
-      color: var(--text-primary);
+      background-color: var(--bg-space);
+      color: var(--text-main);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       min-height: 100vh;
-      padding-bottom: 40px;
+      padding-bottom: 60px;
     }
 
-    .navbar-custom {
-      background-color: rgba(15, 23, 42, 0.95);
-      backdrop-filter: blur(8px);
-      border-bottom: 1px solid var(--border-color);
+    /* Top Navigation */
+    .navbar-surveillance {
+      background: rgba(14, 22, 38, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 12px 0;
     }
 
-    .stat-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 1.25rem;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-    .stat-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-    }
-    .stat-value {
-      font-size: 2rem;
-      font-weight: 700;
-      line-height: 1.2;
+    .brand-beacon {
+      width: 10px;
+      height: 10px;
+      background: var(--green-safe);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--green-safe);
+      display: inline-block;
+      animation: pulse 2s infinite;
     }
 
-    .card-custom {
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
+    @keyframes pulse {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+
+    /* Glass Cards */
+    .panel-glass {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
       border-radius: 12px;
       overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
     }
 
-    .card-header-custom {
-      background: rgba(30, 41, 59, 0.8);
-      border-bottom: 1px solid var(--border-color);
-      padding: 0.9rem 1.25rem;
+    .panel-header {
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 12px 18px;
+      font-weight: 600;
+      font-size: 0.92rem;
+      letter-spacing: 0.5px;
+    }
+
+    /* KPI Cards */
+    .kpi-card {
+      background: linear-gradient(145deg, var(--bg-surface), var(--bg-card));
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 16px 20px;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    .kpi-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--cyan-glow);
+    }
+    .kpi-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
       font-weight: 600;
     }
+    .kpi-value {
+      font-size: 1.85rem;
+      font-weight: 800;
+      line-height: 1.2;
+      margin-top: 4px;
+    }
 
-    .video-container {
+    /* Video Player */
+    .video-viewport {
       position: relative;
       background: #000;
       border-radius: 8px;
       overflow: hidden;
+      border: 1px solid var(--border-subtle);
     }
-
-    video {
+    .video-viewport video {
       width: 100%;
       height: auto;
       max-height: 480px;
       display: block;
+      object-fit: contain;
     }
 
+    /* License Plate Badge */
     .license-plate-badge {
       display: inline-block;
       background: #fef08a;
       color: #1c1917;
-      font-family: "Courier New", Courier, monospace;
-      font-weight: 800;
-      font-size: 1.05rem;
-      padding: 3px 10px;
-      border-radius: 6px;
+      font-family: 'Courier New', Courier, monospace;
+      font-weight: 900;
+      padding: 4px 10px;
+      border-radius: 4px;
       border: 2px solid #ca8a04;
-      letter-spacing: 1.5px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      letter-spacing: 2px;
+      font-size: 0.95rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
     }
 
-    .badge-violation {
-      background: rgba(239, 68, 68, 0.2);
-      color: #fca5a5;
-      border: 1px solid rgba(239, 68, 68, 0.5);
-      font-weight: 600;
-      padding: 4px 8px;
-      border-radius: 6px;
-    }
-
-    .badge-compliant {
-      background: rgba(16, 185, 129, 0.2);
-      color: #6ee7b7;
-      border: 1px solid rgba(16, 185, 129, 0.5);
-      font-weight: 600;
-      padding: 4px 8px;
-      border-radius: 6px;
-    }
-
-    .thumbnail-crop {
-      width: 64px;
-      height: 64px;
+    /* Thumbnails */
+    .thumb-scene {
+      width: 60px;
+      height: 60px;
       object-fit: cover;
       border-radius: 6px;
-      border: 1px solid var(--border-color);
+      border: 1px solid var(--border-subtle);
       cursor: pointer;
-      transition: transform 0.2s;
+      transition: transform 0.2s, box-shadow 0.2s;
     }
-    .thumbnail-crop:hover {
+    .thumb-scene:hover {
       transform: scale(1.1);
+      box-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
     }
 
-    .plate-crop-thumbnail {
-      width: 72px;
+    .thumb-plate {
+      width: 76px;
       height: 44px;
       object-fit: cover;
       border-radius: 4px;
@@ -133,48 +154,133 @@
       cursor: pointer;
       transition: transform 0.2s, box-shadow 0.2s;
     }
-    .plate-crop-thumbnail:hover {
+    .thumb-plate:hover {
       transform: scale(1.15);
-      box-shadow: 0 0 10px rgba(202, 138, 4, 0.6);
+      box-shadow: 0 0 12px rgba(202, 138, 4, 0.7);
     }
 
-    .table-custom {
+    /* Badges */
+    .badge-nohelmet {
+      background: rgba(239, 68, 68, 0.2);
+      color: #fca5a5;
+      border: 1px solid rgba(239, 68, 68, 0.5);
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+    .badge-wrongway {
+      background: rgba(220, 38, 38, 0.25);
+      color: #f87171;
+      border: 1px solid #ef4444;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+    .badge-overtaking {
+      background: rgba(6, 182, 212, 0.2);
+      color: #67e8f9;
+      border: 1px solid rgba(6, 182, 212, 0.5);
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    /* Table */
+    .table-surveillance {
       --bs-table-bg: transparent;
-      --bs-table-color: var(--text-primary);
-      --bs-table-border-color: var(--border-color);
+      --bs-table-color: var(--text-main);
+      --bs-table-border-color: var(--border-subtle);
       vertical-align: middle;
+      margin-bottom: 0;
+    }
+    .table-surveillance tbody tr {
+      transition: background-color 0.15s;
+    }
+    .table-surveillance tbody tr:hover {
+      background-color: var(--bg-card);
     }
 
-    .timestamp-btn {
-      background: rgba(6, 182, 212, 0.15);
-      color: var(--accent-cyan);
-      border: 1px solid rgba(6, 182, 212, 0.3);
-      padding: 2px 8px;
-      border-radius: 4px;
-      font-size: 0.85rem;
-      cursor: pointer;
-      text-decoration: none;
+    /* Sliders */
+    .form-range::-webkit-slider-thumb {
+      background: var(--cyan-glow);
     }
-    .timestamp-btn:hover {
-      background: rgba(6, 182, 212, 0.3);
+    .form-range::-moz-range-thumb {
+      background: var(--cyan-glow);
+    }
+
+    /* Dropzone */
+    .upload-dropzone {
+      border: 2px dashed var(--border-subtle);
+      border-radius: 8px;
+      padding: 24px;
+      text-align: center;
+      background: rgba(20, 31, 54, 0.5);
+      cursor: pointer;
+      transition: border-color 0.2s, background-color 0.2s;
+    }
+    .upload-dropzone:hover, .upload-dropzone.dragover {
+      border-color: var(--cyan-glow);
+      background: rgba(6, 182, 212, 0.05);
+    }
+
+    /* Time Button */
+    .btn-seek {
+      background: rgba(14, 165, 233, 0.15);
+      color: #38bdf8;
+      border: 1px solid rgba(14, 165, 233, 0.3);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .btn-seek:hover {
+      background: #0284c7;
       color: #fff;
     }
   </style>
 </head>
 <body>
 
-  <!-- Top Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-dark navbar-custom sticky-top">
+  <!-- Top Navigation Bar -->
+  <nav class="navbar navbar-surveillance sticky-top">
     <div class="container-fluid px-4">
-      <a class="navbar-brand d-flex align-items-center gap-2 fw-bold" href="#">
-        <i class="bi bi-shield-check text-cyan fs-4"></i>
-        <span>TrafficGuard AI</span>
-        <span class="badge bg-secondary text-uppercase ms-2" style="font-size: 0.7rem;">Two-Wheeler Enforcement</span>
-      </a>
       <div class="d-flex align-items-center gap-3">
-        <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2">
-          <i class="bi bi-cpu-fill me-1"></i> T4 GPU Inference Active
+        <span class="brand-beacon"></span>
+        <span class="fw-bold fs-5 tracking-wide text-white">
+          <i class="bi bi-shield-fill-check text-info me-1"></i> TRAFFIC-GUARD
         </span>
+        <span class="badge bg-dark border border-secondary text-secondary small px-2 py-1">
+          v2.0 // HIGH-CLARITY ANPR & EGO-COMPENSATED MOTION
+        </span>
+      </div>
+
+      <div class="d-flex align-items-center gap-3">
+        <!-- Live System Badges -->
+        <div class="d-none d-md-flex align-items-center gap-2 small text-secondary">
+          <span class="d-flex align-items-center gap-1">
+            <i class="bi bi-cpu text-warning"></i> Host CPU i5-1335U
+          </span>
+          <span class="text-secondary">&bull;</span>
+          <span class="d-flex align-items-center gap-1 text-success">
+            <i class="bi bi-circle-fill" style="font-size: 0.5rem;"></i> Active Engine
+          </span>
+        </div>
+
+        <!-- Action Buttons -->
+        <button class="btn btn-sm btn-outline-info d-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#settingsModal">
+          <i class="bi bi-sliders"></i> Thresholds
+        </button>
+        <button class="btn btn-sm btn-outline-light d-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#uploadModal">
+          <i class="bi bi-cloud-arrow-up"></i> Upload
+        </button>
+        <a href="/api/export/json?video_id={{ active_video_id }}" class="btn btn-sm btn-primary d-flex align-items-center gap-1">
+          <i class="bi bi-download"></i> Export JSON
+        </a>
       </div>
     </div>
   </nav>
@@ -182,196 +288,257 @@
   <!-- Main Container -->
   <div class="container-fluid px-4 py-4">
 
-    <!-- KPI Metric Cards -->
+    <!-- KPI Metric Cards Grid -->
     <div class="row g-3 mb-4">
       <div class="col-12 col-sm-6 col-xl-3">
-        <div class="stat-card">
-          <div class="d-flex justify-content-between align-items-center mb-1">
-            <span class="text-secondary small fw-semibold text-uppercase">Riders Tracked</span>
-            <i class="bi bi-bicycle text-primary fs-4"></i>
+        <div class="kpi-card">
+          <div class="d-flex justify-content-between align-items-center">
+            <span class="kpi-label">Vehicles & Riders Tracked</span>
+            <i class="bi bi-bicycle text-info fs-4"></i>
           </div>
-          <div class="stat-value text-white" id="stat-riders">{{ data.total_riders_tracked }}</div>
-          <div class="text-secondary small mt-1">Multi-object ByteTrack tracking</div>
+          <div class="kpi-value text-white">{{ data.total_riders_tracked if data.total_riders_tracked > 0 else data.total_frames }}</div>
+          <div class="small text-secondary mt-1">Multi-object ByteTrack tracking</div>
         </div>
       </div>
+
       <div class="col-12 col-sm-6 col-xl-3">
-        <div class="stat-card">
-          <div class="d-flex justify-content-between align-items-center mb-1">
-            <span class="text-secondary small fw-semibold text-uppercase">Helmet Compliance</span>
-            <i class="bi bi-shield-shaded text-success fs-4"></i>
+        <div class="kpi-card">
+          <div class="d-flex justify-content-between align-items-center">
+            <span class="kpi-label">Helmet Compliance</span>
+            <i class="bi bi-shield-check text-success fs-4"></i>
           </div>
-          <div class="stat-value text-success" id="stat-compliance">
-            {{ "%.1f"|format((data.compliant_riders / data.total_riders_tracked) * 100) }}%
+          <div class="kpi-value text-success">
+            {% if data.total_riders_tracked > 0 %}
+              {{ "%.1f"|format((data.compliant_riders / data.total_riders_tracked) * 100) }}%
+            {% else %}
+              100%
+            {% endif %}
           </div>
-          <div class="text-secondary small mt-1">{{ data.compliant_riders }} riders compliant</div>
+          <div class="small text-secondary mt-1">{{ data.compliant_riders }} riders compliant in corridor</div>
         </div>
       </div>
+
       <div class="col-12 col-sm-6 col-xl-3">
-        <div class="stat-card">
-          <div class="d-flex justify-content-between align-items-center mb-1">
-            <span class="text-secondary small fw-semibold text-uppercase">Helmet Violations</span>
-            <i class="bi bi-exclamation-octagon-fill text-danger fs-4"></i>
+        <div class="kpi-card">
+          <div class="d-flex justify-content-between align-items-center">
+            <span class="kpi-label">Active Infractions</span>
+            <i class="bi bi-exclamation-triangle-fill text-danger fs-4"></i>
           </div>
-          <div class="stat-value text-danger" id="stat-violations">{{ data.violations_detected }}</div>
-          <div class="text-secondary small mt-1">Confirmed no-helmet infractions</div>
+          <div class="kpi-value text-danger">{{ data.violations_detected }}</div>
+          <div class="small text-secondary mt-1">Confirmed policy violations</div>
         </div>
       </div>
+
       <div class="col-12 col-sm-6 col-xl-3">
-        <div class="stat-card">
-          <div class="d-flex justify-content-between align-items-center mb-1">
-            <span class="text-secondary small fw-semibold text-uppercase">Plates Extracted</span>
-            <i class="bi bi-camera text-warning fs-4"></i>
+        <div class="kpi-card">
+          <div class="d-flex justify-content-between align-items-center">
+            <span class="kpi-label">Plates Recognized</span>
+            <i class="bi bi-camera-fill text-warning fs-4"></i>
           </div>
-          <div class="stat-value text-warning" id="stat-plates">{{ data.plates_extracted }}</div>
-          <div class="text-secondary small mt-1">100% matched to offenders</div>
+          <div class="kpi-value text-warning">{{ data.plates_extracted }}</div>
+          <div class="small text-secondary mt-1">High-clarity multi-line OCR matches</div>
         </div>
       </div>
     </div>
 
-    <!-- Main Workspace -->
+    <!-- Main Studio Grid -->
     <div class="row g-4">
 
-      <!-- Left Column: Video Player & Selection -->
+      <!-- Left Column: Video Telemetry & Studio -->
       <div class="col-12 col-lg-7">
-        <div class="card-custom">
-          <div class="card-header-custom d-flex justify-content-between align-items-center">
-            <span class="d-flex align-items-center gap-2">
-              <i class="bi bi-play-circle text-info"></i>
-              Annotated Video Playback & HUD Overlay
-            </span>
+        <div class="panel-glass">
+          <div class="panel-header d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-2">
+              <i class="bi bi-camera-reels-fill text-info"></i>
+              <span>Inspection Viewport & HUD Overlay</span>
+            </div>
             <span class="badge bg-dark border border-secondary text-secondary small">
-              {{ data.fps }} FPS | {{ data.duration_sec }}s
+              {{ data.fps }} FPS | {{ data.duration_sec }}s Duration
             </span>
           </div>
+
           <div class="p-3">
-            <div class="video-container mb-3 shadow">
-              <video id="trafficVideo" controls preload="metadata" poster="">
+            <!-- Video Player -->
+            <div class="video-viewport mb-3">
+              <video id="surveillanceVideo" controls preload="auto" playsinline>
                 <source src="{{ active_video }}" type="video/mp4">
                 Your browser does not support HTML5 video.
               </video>
             </div>
 
-            <!-- Video Controls & Upload Form -->
+            <!-- Custom Playback Toolbar -->
+            <div class="d-flex justify-content-between align-items-center bg-dark p-2 rounded border border-secondary mb-3">
+              <div class="d-flex align-items-center gap-2 small">
+                <span class="text-secondary">Playback Speed:</span>
+                <button class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="setSpeed(0.5)">0.5x</button>
+                <button class="btn btn-sm btn-outline-info py-0 px-2 active" id="btnSpeed1" onclick="setSpeed(1.0)">1.0x</button>
+                <button class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="setSpeed(1.5)">1.5x</button>
+                <button class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="setSpeed(2.0)">2.0x</button>
+              </div>
+              <div class="small text-secondary" id="playbackTimeDisplay">0.0s / {{ data.duration_sec }}s</div>
+            </div>
+
+            <!-- Video Catalog Selection Form -->
             <div class="row g-2 align-items-center">
-              <div class="col-md-7">
-                <label class="form-label small text-secondary mb-1">Select Analysis Footage</label>
-                <select class="form-select bg-dark text-white border-secondary" id="sampleSelect" onchange="changeVideo()">
+              <div class="col-md-8">
+                <label class="form-label small text-secondary mb-1">Select Active Footage</label>
+                <select class="form-select bg-dark text-white border-secondary" id="footageSelect" onchange="onFootageChange()">
                   {% for s in samples %}
-                  <option value="{{ s.path }}">{{ s.name }}</option>
+                  <option value="{{ s.id }}" {% if s.id == active_video_id %}selected{% endif %}>
+                    {{ s.name }} ({{ s.pipeline }})
+                  </option>
                   {% endfor %}
                 </select>
               </div>
-              <div class="col-md-5 d-flex align-items-end gap-2">
-                <button type="button" class="btn btn-outline-info w-100 mt-4" data-bs-toggle="modal" data-bs-target="#uploadModal">
-                  <i class="bi bi-cloud-arrow-up me-1"></i> Upload Video
-                </button>
-                <button type="button" class="btn btn-primary w-100 mt-4" onclick="runAnalysis()">
-                  <i class="bi bi-lightning-charge me-1"></i> Analyze
+              <div class="col-md-4 d-flex align-items-end">
+                <button type="button" class="btn btn-primary w-100" id="btnRunAnalysis" onclick="triggerAnalysis()">
+                  <i class="bi bi-lightning-charge me-1"></i> Run Analysis
                 </button>
               </div>
+            </div>
+
+            <div class="mt-2 small text-muted">
+              {% for s in samples %}
+                {% if s.id == active_video_id %}
+                <i class="bi bi-info-circle me-1 text-info"></i> {{ s.description }}
+                {% endif %}
+              {% endfor %}
             </div>
           </div>
         </div>
 
-        <!-- Pipeline Overview Box -->
-        <div class="card-custom mt-3">
-          <div class="card-header-custom">
-            <i class="bi bi-diagram-3 me-1 text-info"></i> Automated Enforcement Architecture
+        <!-- Architecture Specification Box -->
+        <div class="panel-glass mt-3">
+          <div class="panel-header d-flex justify-content-between align-items-center">
+            <span><i class="bi bi-diagram-3-fill text-info me-1"></i> Multi-Stage Pipeline Telemetry</span>
+            <span class="badge bg-dark border border-secondary text-info small">Active Config</span>
           </div>
           <div class="p-3 small text-secondary">
-            <ol class="mb-0 ps-3">
-              <li><strong>Detection & Tracking:</strong> YOLO11s detects persons and motorcycles; ByteTrack assigns persistent IDs.</li>
-              <li><strong>Rider Association:</strong> Vertical/horizontal geometric matrix binds rider to motorcycle seat.</li>
-              <li><strong>Helmet Verification:</strong> Specialized YOLOv8 classifies head ROI; temporal voting eliminates false alerts.</li>
-              <li><strong>Targeted ANPR:</strong> For no-helmet riders, motorcycle crop triggers YOLO plate detector + GPU EasyOCR.</li>
-            </ol>
+            <div class="row g-3">
+              <div class="col-md-4 border-end border-secondary">
+                <div class="fw-bold text-white mb-1"><i class="bi bi-bicycle text-warning me-1"></i> Helmet & Rider</div>
+                <div>Confidence: <strong>{{ settings.helmet.helmet_confidence_threshold }}</strong></div>
+                <div>Persistence: <strong>{{ settings.helmet.helmet_persistence_frames }} frames</strong></div>
+                <div>IoU Match: <strong>{{ settings.helmet.rider_iou_threshold }}</strong></div>
+              </div>
+              <div class="col-md-4 border-end border-secondary">
+                <div class="fw-bold text-white mb-1"><i class="bi bi-camera text-info me-1"></i> High-Clarity ANPR</div>
+                <div>Min Clarity: <strong>{{ settings.plate_ocr.min_plate_clarity_score }}</strong></div>
+                <div>Super-Res: <strong>{{ settings.plate_ocr.plate_upscale_factor }}x Bicubic</strong></div>
+                <div>OCR Conf: <strong>{{ settings.plate_ocr.min_ocr_confidence }}</strong></div>
+              </div>
+              <div class="col-md-4">
+                <div class="fw-bold text-white mb-1"><i class="bi bi-arrows-collapse text-danger me-1"></i> Ego-Kinematics</div>
+                <div>Wrong-Way: <strong>{{ settings.wrong_way.wrong_way_v_thresh }} m/s</strong></div>
+                <div>Reversing: <strong>{{ settings.wrong_way.reversing_v_thresh }} m/s</strong></div>
+                <div>Hysteresis: <strong>{{ settings.wrong_way.hysteresis_k_frames }}/{{ settings.wrong_way.hysteresis_n_frames }} frames</strong></div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Right Column: Violations & Extracted Number Plates -->
+      <!-- Right Column: Violations & Evidence Feed -->
       <div class="col-12 col-lg-5">
-        <div class="card-custom h-100">
-          <div class="card-header-custom d-flex justify-content-between align-items-center">
-            <span class="d-flex align-items-center gap-2">
-              <i class="bi bi-shield-slash text-danger"></i>
-              Violations & License Plate Evidence Feed
-            </span>
-            <span class="badge bg-danger rounded-pill px-2 py-1">{{ data.violations_detected }} Incidents</span>
+        <div class="panel-glass h-100">
+          <div class="panel-header d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-2">
+              <i class="bi bi-shield-slash-fill text-danger"></i>
+              <span>Violations & Evidence Audit Feed</span>
+            </div>
+            <span class="badge bg-danger rounded-pill px-2 py-1">{{ data.violations_detected }} Confirmed</span>
           </div>
 
           <div class="p-3">
-            <div class="table-responsive">
-              <table class="table table-custom">
+            <!-- Filter Pills -->
+            <div class="d-flex align-items-center gap-2 mb-3">
+              <button class="btn btn-sm btn-outline-info active py-1 px-3" onclick="filterViolations('ALL')">All</button>
+              <button class="btn btn-sm btn-outline-secondary py-1 px-2" onclick="filterViolations('NO_HELMET')">No Helmet</button>
+              <button class="btn btn-sm btn-outline-secondary py-1 px-2" onclick="filterViolations('WRONG_WAY')">Wrong Way</button>
+            </div>
+
+            <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
+              <table class="table table-surveillance">
                 <thead>
-                  <tr class="text-secondary small text-uppercase">
-                    <th>Evidence</th>
+                  <tr class="small text-secondary text-uppercase border-bottom border-secondary">
+                    <th>Dual Evidence</th>
                     <th>Offender</th>
-                    <th>Extracted Number Plate</th>
+                    <th>License Plate / State</th>
                     <th>Time</th>
                   </tr>
                 </thead>
-                <tbody id="incidentsTable">
+                <tbody id="incidentsBody">
                   {% for inc in data.incidents %}
-                  <tr>
+                  <tr class="incident-row" data-type="{{ inc.violation_type or inc.type }}">
                     <td>
                       <div class="d-flex align-items-center gap-2">
                         {% if inc.snapshot_path %}
                         <div class="text-center">
-                          <img src="{{ inc.snapshot_path }}" alt="{{ inc.incident_id }}" class="thumbnail-crop" title="Rider & Vehicle Scene" onclick="openImageModal('{{ inc.snapshot_path }}', '{{ inc.incident_id }} - Offender Scene')">
+                          <img src="{{ inc.snapshot_path }}" alt="Offender" class="thumb-scene" title="Offender Scene Context" onclick="openLightbox('{{ inc.snapshot_path }}', '{{ inc.incident_id or inc.track_id }} - Scene Evidence')">
                           <div class="text-secondary mt-1" style="font-size: 0.65rem;">Scene</div>
                         </div>
                         {% else %}
-                        <div class="thumbnail-crop bg-dark d-flex align-items-center justify-content-center text-secondary small">N/A</div>
+                        <div class="thumb-scene bg-dark d-flex align-items-center justify-content-center text-secondary small">N/A</div>
                         {% endif %}
+
                         {% if inc.plate_crop_path %}
                         <div class="text-center">
-                          <img src="{{ inc.plate_crop_path }}" alt="{{ inc.incident_id }} Plate" class="plate-crop-thumbnail" title="High-Clarity Plate Crop" onclick="openImageModal('{{ inc.plate_crop_path }}', '{{ inc.incident_id }} - High Clarity Plate Crop')">
+                          <img src="{{ inc.plate_crop_path }}" alt="Plate" class="thumb-plate" title="High-Clarity Plate Crop" onclick="openLightbox('{{ inc.plate_crop_path }}', '{{ inc.incident_id }} - High-Clarity Plate Crop')">
                           <div class="text-warning mt-1" style="font-size: 0.65rem;">Plate Crop</div>
                         </div>
                         {% endif %}
                       </div>
                     </td>
+
                     <td>
-                      <div class="fw-bold text-white">{{ inc.incident_id }}</div>
+                      <div class="fw-bold text-white">{{ inc.incident_id or ('TRACK #' ~ inc.track_id) }}</div>
+                      {% if inc.rider_id %}
                       <div class="small text-secondary">Rider #{{ inc.rider_id }} (Moto #{{ inc.motorcycle_id }})</div>
-                      <span class="badge-violation small mt-1 d-inline-block">
+                      <span class="badge-nohelmet mt-1 d-inline-block">
                         <i class="bi bi-exclamation-triangle-fill me-1"></i> NO HELMET
                       </span>
+                      {% elif inc.type %}
+                      <div class="small text-secondary">{{ inc.vehicle_type }}</div>
+                      <span class="badge-wrongway mt-1 d-inline-block">
+                        <i class="bi bi-sign-stop-fill me-1"></i> {{ inc.type }}
+                      </span>
+                      {% endif %}
                     </td>
+
                     <td>
+                      {% if inc.plate_number and inc.plate_number != 'SCANNING...' %}
                       <div class="license-plate-badge">{{ inc.plate_number }}</div>
                       <div class="d-flex align-items-center gap-2 mt-1">
                         <span class="small text-secondary">Conf: {{ "%.2f"|format(inc.plate_confidence) }}</span>
                         {% if inc.plate_clarity %}
-                        <span class="badge bg-dark border border-secondary text-info" style="font-size: 0.65rem;">Clarity: {{ "%.0f"|format(inc.plate_clarity) }}</span>
+                        <span class="badge bg-dark border border-secondary text-info" style="font-size: 0.65rem;">
+                          Clarity: {{ "%.0f"|format(inc.plate_clarity) }}
+                        </span>
                         {% endif %}
                       </div>
+                      {% else %}
+                      <span class="badge-overtaking">LEGAL OVERTAKING</span>
+                      <div class="small text-secondary mt-1">Flow Normal</div>
+                      {% endif %}
                     </td>
+
                     <td>
-                      <a href="javascript:void(0)" class="timestamp-btn" onclick="seekVideo({{ inc.timestamp_sec }})">
-                        <i class="bi bi-play-fill"></i> {{ inc.timestamp_sec }}s
+                      <a href="javascript:void(0)" class="btn-seek" onclick="seekVideo({{ inc.timestamp_sec or inc.first_detected_time_sec }})">
+                        <i class="bi bi-play-fill"></i> {{ inc.timestamp_sec or inc.first_detected_time_sec }}s
                       </a>
+                    </td>
+                  </tr>
+                  {% else %}
+                  <tr>
+                    <td colspan="4" class="text-center text-secondary py-4">
+                      <i class="bi bi-check-circle-fill text-success fs-3 d-block mb-2"></i>
+                      No violations detected in current video feed.
                     </td>
                   </tr>
                   {% endfor %}
                 </tbody>
               </table>
             </div>
-
-            <!-- Enforcement Export Box -->
-            <div class="p-3 bg-dark rounded border border-secondary mt-3">
-              <div class="d-flex justify-content-between align-items-center">
-                <div>
-                  <div class="fw-semibold text-white small">Audit Trail & E-Challan Data</div>
-                  <div class="text-secondary small" style="font-size: 0.75rem;">Verified cryptographic timestamp & OCR record</div>
-                </div>
-                <a href="/api/results" class="btn btn-sm btn-outline-light" download="traffic_violations.json">
-                  <i class="bi bi-download me-1"></i> Export JSON
-                </a>
-              </div>
-            </div>
-
           </div>
         </div>
       </div>
@@ -379,52 +546,151 @@
     </div>
   </div>
 
-  <!-- Upload Modal -->
-  <div class="modal fade" id="uploadModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content bg-dark text-white border-secondary">
+  <!-- Modal: Live Threshold Configuration -->
+  <div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="settingsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content panel-glass text-white">
         <div class="modal-header border-secondary">
-          <h5 class="modal-title"><i class="bi bi-upload me-2 text-info"></i>Upload Video for Analysis</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          <h5 class="modal-title d-flex align-items-center gap-2" id="settingsModalLabel">
+            <i class="bi bi-sliders text-info"></i> Detection Sensitivity & Threshold Configuration
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="modal-body">
-          <form id="uploadForm" enctype="multipart/form-data">
-            <div class="mb-3">
-              <label for="videoFile" class="form-label text-secondary">Select MP4 Dashcam / Traffic Footage</label>
-              <input class="form-control bg-dark text-white border-secondary" type="file" id="videoFile" name="file" accept="video/mp4,video/avi,video/mov" required>
+        <div class="modal-body p-4">
+          <form id="settingsForm">
+            <!-- Helmet Thresholds -->
+            <h6 class="text-info fw-bold mb-3"><i class="bi bi-bicycle me-1"></i> Motorcycle Helmet Detection</h6>
+            <div class="row g-3 mb-4">
+              <div class="col-md-4">
+                <label class="form-label small text-secondary">Helmet Confidence Threshold: <span class="text-white fw-bold" id="val_helmet_conf">{{ settings.helmet.helmet_confidence_threshold }}</span></label>
+                <input type="range" class="form-range" id="input_helmet_conf" min="0.10" max="0.90" step="0.05" value="{{ settings.helmet.helmet_confidence_threshold }}" oninput="updateVal('helmet_conf')">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label small text-secondary">Persistence Window: <span class="text-white fw-bold" id="val_helmet_persist">{{ settings.helmet.helmet_persistence_frames }} frames</span></label>
+                <input type="range" class="form-range" id="input_helmet_persist" min="1" max="15" step="1" value="{{ settings.helmet.helmet_persistence_frames }}" oninput="updateVal('helmet_persist')">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label small text-secondary">Rider-Motorcycle IoU: <span class="text-white fw-bold" id="val_rider_iou">{{ settings.helmet.rider_iou_threshold }}</span></label>
+                <input type="range" class="form-range" id="input_rider_iou" min="0.05" max="0.50" step="0.05" value="{{ settings.helmet.rider_iou_threshold }}" oninput="updateVal('rider_iou')">
+              </div>
             </div>
-            <div class="progress d-none mb-3" id="uploadProgress">
-              <div class="progress-bar progress-bar-striped progress-bar-animated bg-info" style="width: 100%">Uploading...</div>
+
+            <!-- License Plate Thresholds -->
+            <h6 class="text-warning fw-bold mb-3"><i class="bi bi-camera me-1"></i> License Plate Extraction & ANPR</h6>
+            <div class="row g-3 mb-4">
+              <div class="col-md-4">
+                <label class="form-label small text-secondary">Min Laplacian Clarity Score: <span class="text-white fw-bold" id="val_plate_clarity">{{ settings.plate_ocr.min_plate_clarity_score }}</span></label>
+                <input type="range" class="form-range" id="input_plate_clarity" min="10" max="300" step="10" value="{{ settings.plate_ocr.min_plate_clarity_score }}" oninput="updateVal('plate_clarity')">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label small text-secondary">Super-Resolution Scale</label>
+                <select class="form-select bg-dark text-white border-secondary" id="input_plate_scale">
+                  <option value="1.5" {% if settings.plate_ocr.plate_upscale_factor == 1.5 %}selected{% endif %}>1.5x (Fast)</option>
+                  <option value="2.0" {% if settings.plate_ocr.plate_upscale_factor == 2.0 %}selected{% endif %}>2.0x (Standard)</option>
+                  <option value="2.5" {% if settings.plate_ocr.plate_upscale_factor == 2.5 %}selected{% endif %}>2.5x (Recommended)</option>
+                  <option value="3.0" {% if settings.plate_ocr.plate_upscale_factor == 3.0 %}selected{% endif %}>3.0x (Ultra)</option>
+                </select>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label small text-secondary">Min OCR Confidence: <span class="text-white fw-bold" id="val_ocr_conf">{{ settings.plate_ocr.min_ocr_confidence }}</span></label>
+                <input type="range" class="form-range" id="input_ocr_conf" min="0.10" max="0.90" step="0.05" value="{{ settings.plate_ocr.min_ocr_confidence }}" oninput="updateVal('ocr_conf')">
+              </div>
             </div>
-            <div class="d-flex justify-content-end gap-2">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-              <button type="submit" class="btn btn-primary" id="uploadBtn">Upload & Stage</button>
+
+            <!-- Wrong-Way Thresholds -->
+            <h6 class="text-danger fw-bold mb-3"><i class="bi bi-sign-stop me-1"></i> Ego-Compensated Wrong-Way Motion</h6>
+            <div class="row g-3 mb-2">
+              <div class="col-md-4">
+                <label class="form-label small text-secondary">Wrong-Way Speed Threshold: <span class="text-white fw-bold" id="val_wrongway_v">{{ settings.wrong_way.wrong_way_v_thresh }} m/s</span></label>
+                <input type="range" class="form-range" id="input_wrongway_v" min="1.0" max="15.0" step="0.5" value="{{ settings.wrong_way.wrong_way_v_thresh }}" oninput="updateVal('wrongway_v')">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label small text-secondary">Reversing Speed Threshold: <span class="text-white fw-bold" id="val_reversing_v">{{ settings.wrong_way.reversing_v_thresh }} m/s</span></label>
+                <input type="range" class="form-range" id="input_reversing_v" min="0.5" max="8.0" step="0.5" value="{{ settings.wrong_way.reversing_v_thresh }}" oninput="updateVal('reversing_v')">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label small text-secondary">Hysteresis Window: <span class="text-white fw-bold" id="val_hysteresis_k">{{ settings.wrong_way.hysteresis_k_frames }} of 10 frames</span></label>
+                <input type="range" class="form-range" id="input_hysteresis_k" min="4" max="10" step="1" value="{{ settings.wrong_way.hysteresis_k_frames }}" oninput="updateVal('hysteresis_k')">
+              </div>
             </div>
           </form>
         </div>
+        <div class="modal-footer border-secondary">
+          <button type="button" class="btn btn-outline-secondary" onclick="resetDefaults()">Reset to Defaults</button>
+          <button type="button" class="btn btn-primary" id="btnSaveSettings" onclick="saveSettings()">Save Configuration</button>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Snapshot Modal -->
-  <div class="modal fade" id="imageModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-      <div class="modal-content bg-dark text-white border-secondary">
+  <!-- Modal: Video Upload -->
+  <div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content panel-glass text-white">
         <div class="modal-header border-secondary">
-          <h5 class="modal-title" id="imageModalTitle">Violation Evidence Snapshot</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          <h5 class="modal-title d-flex align-items-center gap-2" id="uploadModalLabel">
+            <i class="bi bi-cloud-arrow-up text-info"></i> Ingest New Traffic Footage
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="modal-body text-center p-2">
-          <img src="" id="imageModalSrc" class="img-fluid rounded shadow" alt="Evidence">
+        <div class="modal-body p-4">
+          <div class="upload-dropzone mb-3" onclick="document.getElementById('videoFile').click()">
+            <i class="bi bi-film fs-1 text-info d-block mb-2"></i>
+            <span class="fw-bold">Click or drag video file here</span>
+            <div class="small text-secondary mt-1">Supports MP4, AVI, MOV formats</div>
+          </div>
+          <input type="file" id="videoFile" class="d-none" accept=".mp4,.avi,.mov,.mkv" onchange="handleFileSelect(event)">
+          <div id="selectedFileName" class="small text-info mb-3 d-none"></div>
+
+          <div class="progress d-none mb-3" id="uploadProgress">
+            <div class="progress-bar progress-bar-striped progress-bar-animated bg-info" style="width: 100%">Uploading...</div>
+          </div>
+        </div>
+        <div class="modal-footer border-secondary">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" id="btnUploadSubmit" onclick="uploadVideo()">Upload Video</button>
         </div>
       </div>
     </div>
   </div>
 
+  <!-- Modal: Lightbox Evidence Modal -->
+  <div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content panel-glass text-white">
+        <div class="modal-header border-secondary">
+          <h5 class="modal-title" id="imageModalTitle">Evidence Snapshot</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-2 text-center bg-black">
+          <img id="imageModalSrc" src="" alt="Evidence" class="img-fluid rounded shadow" style="max-height: 550px;">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    const video = document.getElementById('trafficVideo');
+    const video = document.getElementById('surveillanceVideo');
 
+    // Video Speed Control
+    function setSpeed(speed) {
+      if (video) {
+        video.playbackRate = speed;
+      }
+    }
+
+    // Time display update
+    if (video) {
+      video.addEventListener('timeupdate', () => {
+        const cur = video.currentTime.toFixed(1);
+        const dur = isNaN(video.duration) ? '0.0' : video.duration.toFixed(1);
+        document.getElementById('playbackTimeDisplay').textContent = `${cur}s / ${dur}s`;
+      });
+    }
+
+    // Jump to timestamp
     function seekVideo(seconds) {
       if (video) {
         video.currentTime = Math.max(0, seconds - 1);
@@ -432,47 +698,161 @@
       }
     }
 
-    function changeVideo() {
-      const select = document.getElementById('sampleSelect');
-      const newSrc = select.value;
-      video.src = newSrc;
-      video.load();
-      video.play();
+    // Switch video footage
+    function onFootageChange() {
+      const select = document.getElementById('footageSelect');
+      const val = select.value;
+      window.location.href = `/?video_id=${val}`;
     }
 
-    function openImageModal(src, id) {
+    // Lightbox modal
+    function openLightbox(src, title) {
       document.getElementById('imageModalSrc').src = src;
-      document.getElementById('imageModalTitle').textContent = `Evidence Snapshot - ${id}`;
+      document.getElementById('imageModalTitle').textContent = title;
       const modal = new bootstrap.Modal(document.getElementById('imageModal'));
       modal.show();
     }
 
-    function runAnalysis() {
-      const btn = event.target;
-      const originalText = btn.innerHTML;
-      btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Analyzing...';
-      btn.disabled = true;
-
-      fetch('/api/analyze', { method: 'POST' })
-        .then(res => res.json())
-        .then(data => {
-          btn.innerHTML = '<i class="bi bi-check2 me-1"></i> Complete!';
-          setTimeout(() => {
-            btn.innerHTML = originalText;
-            btn.disabled = false;
-          }, 1500);
-        })
-        .catch(err => {
-          console.error(err);
-          btn.innerHTML = originalText;
-          btn.disabled = false;
-        });
+    // Filter Violations
+    function filterViolations(type) {
+      const rows = document.querySelectorAll('.incident-row');
+      rows.forEach(r => {
+        const rType = r.getAttribute('data-type');
+        if (type === 'ALL' || (type === 'NO_HELMET' && rType.includes('NO_HELMET')) || (type === 'WRONG_WAY' && rType.includes('WRONG_WAY'))) {
+          r.style.display = '';
+        } else {
+          r.style.display = 'none';
+        }
+      });
     }
 
-    document.getElementById('uploadForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
+    // Live update slider labels
+    function updateVal(key) {
+      const val = document.getElementById(`input_${key}`).value;
+      if (key === 'helmet_persist') {
+        document.getElementById(`val_${key}`).textContent = `${val} frames`;
+      } else if (key === 'wrongway_v' || key === 'reversing_v') {
+        document.getElementById(`val_${key}`).textContent = `${val} m/s`;
+      } else if (key === 'hysteresis_k') {
+        document.getElementById(`val_${key}`).textContent = `${val} of 10 frames`;
+      } else {
+        document.getElementById(`val_${key}`).textContent = val;
+      }
+    }
+
+    // Save Settings
+    async function saveSettings() {
+      const btn = document.getElementById('btnSaveSettings');
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Saving...';
+      btn.disabled = true;
+
+      const payload = {
+        helmet: {
+          helmet_confidence_threshold: parseFloat(document.getElementById('input_helmet_conf').value),
+          helmet_persistence_frames: parseInt(document.getElementById('input_helmet_persist').value),
+          rider_iou_threshold: parseFloat(document.getElementById('input_rider_iou').value)
+        },
+        plate_ocr: {
+          min_plate_clarity_score: parseFloat(document.getElementById('input_plate_clarity').value),
+          plate_upscale_factor: parseFloat(document.getElementById('input_plate_scale').value),
+          min_ocr_confidence: parseFloat(document.getElementById('input_ocr_conf').value)
+        },
+        wrong_way: {
+          wrong_way_v_thresh: parseFloat(document.getElementById('input_wrongway_v').value),
+          reversing_v_thresh: parseFloat(document.getElementById('input_reversing_v').value),
+          hysteresis_k_frames: parseInt(document.getElementById('input_hysteresis_k').value),
+          hysteresis_n_frames: 10,
+          corridor_tolerance: 0.15
+        }
+      };
+
+      try {
+        const res = await fetch('/api/settings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        btn.innerHTML = '<i class="bi bi-check2 me-1"></i> Saved!';
+        setTimeout(() => {
+          btn.innerHTML = 'Save Configuration';
+          btn.disabled = false;
+          bootstrap.Modal.getInstance(document.getElementById('settingsModal')).hide();
+        }, 1000);
+      } catch (err) {
+        alert('Failed to save settings: ' + err.message);
+        btn.innerHTML = 'Save Configuration';
+        btn.disabled = false;
+      }
+    }
+
+    // Reset Defaults
+    function resetDefaults() {
+      document.getElementById('input_helmet_conf').value = 0.25;
+      document.getElementById('input_helmet_persist').value = 4;
+      document.getElementById('input_rider_iou').value = 0.15;
+      document.getElementById('input_plate_clarity').value = 50.0;
+      document.getElementById('input_plate_scale').value = 2.5;
+      document.getElementById('input_ocr_conf').value = 0.20;
+      document.getElementById('input_wrongway_v').value = 4.0;
+      document.getElementById('input_reversing_v').value = 2.0;
+      document.getElementById('input_hysteresis_k').value = 8;
+
+      updateVal('helmet_conf');
+      updateVal('helmet_persist');
+      updateVal('rider_iou');
+      updateVal('plate_clarity');
+      updateVal('ocr_conf');
+      updateVal('wrongway_v');
+      updateVal('reversing_v');
+      updateVal('hysteresis_k');
+    }
+
+    // Trigger Pipeline Analysis
+    async function triggerAnalysis() {
+      const btn = document.getElementById('btnRunAnalysis');
+      const origText = btn.innerHTML;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Analyzing Pipeline...';
+      btn.disabled = true;
+
+      const videoId = document.getElementById('footageSelect').value;
+      const formData = new FormData();
+      formData.append('video_id', videoId);
+
+      try {
+        const res = await fetch('/api/analyze', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+        btn.innerHTML = '<i class="bi bi-check2-circle me-1"></i> Verified!';
+        setTimeout(() => {
+          btn.innerHTML = origText;
+          btn.disabled = false;
+        }, 1500);
+      } catch (err) {
+        btn.innerHTML = origText;
+        btn.disabled = false;
+        alert('Analysis error: ' + err.message);
+      }
+    }
+
+    // File Upload Handling
+    function handleFileSelect(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const nameDiv = document.getElementById('selectedFileName');
+        nameDiv.textContent = `Selected: ${file.name} (${(file.size / 1024 / 1024).toFixed(1)} MB)`;
+        nameDiv.classList.remove('d-none');
+      }
+    }
+
+    async function uploadVideo() {
       const fileInput = document.getElementById('videoFile');
-      if (!fileInput.files.length) return;
+      if (!fileInput.files.length) {
+        alert('Please select a video file first.');
+        return;
+      }
 
       const formData = new FormData();
       formData.append('file', fileInput.files[0]);
@@ -491,11 +871,10 @@
         alert(`Video "${data.filename}" uploaded successfully!`);
         location.reload();
       } catch (err) {
-        console.error(err);
         progress.classList.add('d-none');
         alert('Upload failed: ' + err.message);
       }
-    });
+    }
   </script>
 </body>
 </html>

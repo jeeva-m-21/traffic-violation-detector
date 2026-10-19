@@ -1,0 +1,19 @@
+{
+  "helmet": {
+    "helmet_confidence_threshold": 0.4,
+    "helmet_persistence_frames": 5,
+    "rider_iou_threshold": 0.2
+  },
+  "plate_ocr": {
+    "min_plate_clarity_score": 75.0,
+    "plate_upscale_factor": 3.0,
+    "min_ocr_confidence": 0.35
+  },
+  "wrong_way": {
+    "wrong_way_v_thresh": 5.0,
+    "reversing_v_thresh": 2.5,
+    "hysteresis_k_frames": 9,
+    "hysteresis_n_frames": 10,
+    "corridor_tolerance": 0.18
+  }
+}

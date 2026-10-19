@@ -69,6 +69,14 @@
 - [x] SPRINT-11.4: Hysteresis State Machine & Pipeline Integration (`src/violations/state_machine.py`, `run_violation_pipeline.py`)
 - [x] SPRINT-11.5: Benchmark & Regression Suite (`tests/test_wrongway_detector.py`)
 
+## SPRINT-12: Professional Unified Traffic Enforcement Dashboard & Threshold Tuning Interface
+- [x] SPRINT-12.1: Configurable violation thresholds & settings API (`/api/settings`, `config/settings.json`)
+- [x] SPRINT-12.2: Unit tests for settings API, dynamic filtering, and export endpoints (`tests/test_api.py`)
+- [x] SPRINT-12.3: Multi-pipeline data integration (Helmet+ANPR & Wrong-Way/Reversing) in `app.py`
+- [x] SPRINT-12.4: Professional dashboard redesign with live threshold sliders, upload dropzone, video speed controls, and interactive evidence feed (`templates/index.html`)
+- [x] SPRINT-12.5: End-to-end verification, Playwright audit, and atomic commit
+
+
 
 
 
