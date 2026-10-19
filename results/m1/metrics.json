@@ -1,0 +1,23 @@
+{
+  "model": "yolo11s.pt",
+  "imgsz": 640,
+  "conf": 0.25,
+  "seed": 42,
+  "sample_size": 200,
+  "mAP50_95": 0.4763,
+  "mAP50": 0.6313,
+  "mean_class_AP50": 0.6313,
+  "per_class_AP50": {
+    "car": 0.5649,
+    "motorcycle": 0.6737,
+    "bus": 0.8218,
+    "truck": 0.4648
+  },
+  "count_MAE": 1.205,
+  "count_exact_match_rate": 0.405,
+  "checks": {
+    "mean_AP50_ge_0.50": true,
+    "count_MAE_le_1.0": false,
+    "all_artifacts_exist": true
+  }
+}
