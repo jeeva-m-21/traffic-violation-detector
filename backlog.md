@@ -47,3 +47,12 @@
 - [x] SPRINT-8.4: Build end-to-end video pipeline runner with dual-stage detection & HUD overlays (`run_helmet_pipeline.py`)
 - [x] SPRINT-8.5: Orchestrate pipeline execution on Colab GPU with verified VM teardown (`orchestrate_helmet.py`)
 
+## SPRINT-9: Integrated Helmet-to-ANPR Pipeline & Web Application
+- [x] SPRINT-9.1: Integrated violation event engine linking No-Helmet alerts to plate localization and OCR (`src/pipeline/integrated_event.py`)
+- [x] SPRINT-9.2: Unit tests for integrated violation event engine (`tests/test_integrated_event.py`)
+- [/] SPRINT-9.3: Build unified video processing pipeline & Colab GPU runner (`run_integrated_pipeline.py`)
+- [ ] SPRINT-9.4: Build FastAPI backend & REST API (`app.py`) with sample video catalog
+- [ ] SPRINT-9.5: Build modern HTML5/CSS3 frontend dashboard with video player & violation evidence feed (`templates/index.html`)
+- [ ] SPRINT-9.6: End-to-end verification, artifacts audit, and walkthrough update
+
+
