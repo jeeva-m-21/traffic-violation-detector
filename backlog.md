@@ -44,6 +44,6 @@
 - [x] SPRINT-8.1: Motorcycle & Rider spatial association and head ROI extraction (`src/violations/helmet_detector.py`)
 - [x] SPRINT-8.2: Temporal helmet violation voter & persistence tracker (`src/violations/helmet_voter.py`)
 - [x] SPRINT-8.3: Unit tests for spatial association and temporal voting (`tests/test_helmet_detector.py`)
-- [/] SPRINT-8.4: Build end-to-end video pipeline runner with dual-stage detection & HUD overlays (`run_helmet_pipeline.py`)
-- [ ] SPRINT-8.5: Orchestrate pipeline execution on Colab GPU with verified VM teardown (`orchestrate_helmet.py`)
+- [x] SPRINT-8.4: Build end-to-end video pipeline runner with dual-stage detection & HUD overlays (`run_helmet_pipeline.py`)
+- [x] SPRINT-8.5: Orchestrate pipeline execution on Colab GPU with verified VM teardown (`orchestrate_helmet.py`)
 

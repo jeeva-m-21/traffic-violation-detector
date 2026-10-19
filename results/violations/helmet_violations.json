@@ -1,0 +1,58 @@
+{
+  "video": "/content/helmet_riders_clean.mp4",
+  "total_frames": 1693,
+  "fps": 30.0,
+  "duration_sec": 56.43,
+  "total_riders_tracked": 28,
+  "violations_detected": 3,
+  "violations": [
+    {
+      "rider_track_id": 70,
+      "motorcycle_track_id": 71,
+      "first_seen_sec": 30.67,
+      "violation_confirmed_sec": 31.97,
+      "last_seen_sec": 34.2,
+      "mean_confidence": 0.462,
+      "total_frames_observed": 106,
+      "no_helmet_ratio": 0.5,
+      "sample_bbox_xyxy": [
+        519,
+        216,
+        709,
+        464
+      ]
+    },
+    {
+      "rider_track_id": 109,
+      "motorcycle_track_id": 110,
+      "first_seen_sec": 45.07,
+      "violation_confirmed_sec": 45.23,
+      "last_seen_sec": 45.3,
+      "mean_confidence": 0.588,
+      "total_frames_observed": 8,
+      "no_helmet_ratio": 0.5,
+      "sample_bbox_xyxy": [
+        375,
+        235,
+        573,
+        499
+      ]
+    },
+    {
+      "rider_track_id": 112,
+      "motorcycle_track_id": 113,
+      "first_seen_sec": 50.43,
+      "violation_confirmed_sec": 50.53,
+      "last_seen_sec": 56.43,
+      "mean_confidence": 0.716,
+      "total_frames_observed": 181,
+      "no_helmet_ratio": 1.0,
+      "sample_bbox_xyxy": [
+        1,
+        293,
+        213,
+        519
+      ]
+    }
+  ]
+}
