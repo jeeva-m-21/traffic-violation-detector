@@ -123,6 +123,21 @@
       transform: scale(1.1);
     }
 
+    .plate-crop-thumbnail {
+      width: 72px;
+      height: 44px;
+      object-fit: cover;
+      border-radius: 4px;
+      border: 1px solid #ca8a04;
+      background: #111;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .plate-crop-thumbnail:hover {
+      transform: scale(1.15);
+      box-shadow: 0 0 10px rgba(202, 138, 4, 0.6);
+    }
+
     .table-custom {
       --bs-table-bg: transparent;
       --bs-table-color: var(--text-primary);
@@ -300,11 +315,22 @@
                   {% for inc in data.incidents %}
                   <tr>
                     <td>
-                      {% if inc.snapshot_path %}
-                      <img src="{{ inc.snapshot_path }}" alt="{{ inc.incident_id }}" class="thumbnail-crop" onclick="openImageModal('{{ inc.snapshot_path }}', '{{ inc.incident_id }}')">
-                      {% else %}
-                      <div class="thumbnail-crop bg-dark d-flex align-items-center justify-content-center text-secondary small">N/A</div>
-                      {% endif %}
+                      <div class="d-flex align-items-center gap-2">
+                        {% if inc.snapshot_path %}
+                        <div class="text-center">
+                          <img src="{{ inc.snapshot_path }}" alt="{{ inc.incident_id }}" class="thumbnail-crop" title="Rider & Vehicle Scene" onclick="openImageModal('{{ inc.snapshot_path }}', '{{ inc.incident_id }} - Offender Scene')">
+                          <div class="text-secondary mt-1" style="font-size: 0.65rem;">Scene</div>
+                        </div>
+                        {% else %}
+                        <div class="thumbnail-crop bg-dark d-flex align-items-center justify-content-center text-secondary small">N/A</div>
+                        {% endif %}
+                        {% if inc.plate_crop_path %}
+                        <div class="text-center">
+                          <img src="{{ inc.plate_crop_path }}" alt="{{ inc.incident_id }} Plate" class="plate-crop-thumbnail" title="High-Clarity Plate Crop" onclick="openImageModal('{{ inc.plate_crop_path }}', '{{ inc.incident_id }} - High Clarity Plate Crop')">
+                          <div class="text-warning mt-1" style="font-size: 0.65rem;">Plate Crop</div>
+                        </div>
+                        {% endif %}
+                      </div>
                     </td>
                     <td>
                       <div class="fw-bold text-white">{{ inc.incident_id }}</div>
@@ -315,8 +341,11 @@
                     </td>
                     <td>
                       <div class="license-plate-badge">{{ inc.plate_number }}</div>
-                      <div class="small text-secondary mt-1">
-                        OCR Conf: {{ "%.2f"|format(inc.plate_confidence) }}
+                      <div class="d-flex align-items-center gap-2 mt-1">
+                        <span class="small text-secondary">Conf: {{ "%.2f"|format(inc.plate_confidence) }}</span>
+                        {% if inc.plate_clarity %}
+                        <span class="badge bg-dark border border-secondary text-info" style="font-size: 0.65rem;">Clarity: {{ "%.0f"|format(inc.plate_clarity) }}</span>
+                        {% endif %}
                       </div>
                     </td>
                     <td>

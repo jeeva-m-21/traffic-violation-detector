@@ -72,33 +72,84 @@ writer = cv2.VideoWriter(VIDEO_OUTPUT, fourcc, fps, (width, height))
 
 
 # -------------------------------------------------------------------------
-# OCR & Preprocessing Helpers
+# OCR & Preprocessing Helpers with Clarity Scoring & Multi-Line Assembly
 # -------------------------------------------------------------------------
-clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
-def preprocess_plate(crop_bgr):
-    gray = cv2.cvtColor(crop_bgr, cv2.COLOR_BGR2GRAY)
+def compute_crop_clarity(crop: np.ndarray, min_h: int = 15, min_w: int = 25) -> float:
+    if crop is None or crop.size == 0:
+        return 0.0
+    h, w = crop.shape[:2]
+    if h < min_h or w < min_w:
+        return 0.0
+    gray = cv2.cvtColor(crop, cv2.COLOR_BGR2GRAY) if crop.ndim == 3 else crop
+    lap_var = float(cv2.Laplacian(gray, cv2.CV_64F).var())
+    return round(float(lap_var * np.sqrt(h * w)), 2)
+
+
+def enhance_plate_crop(crop_bgr: np.ndarray, upscale_factor: float = 2.5) -> np.ndarray:
+    if crop_bgr is None or crop_bgr.size == 0:
+        return crop_bgr
+    gray = cv2.cvtColor(crop_bgr, cv2.COLOR_BGR2GRAY) if crop_bgr.ndim == 3 else crop_bgr
+    if upscale_factor > 1.0:
+        gray = cv2.resize(gray, (0, 0), fx=upscale_factor, fy=upscale_factor, interpolation=cv2.INTER_CUBIC)
+    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
     enhanced = clahe.apply(gray)
     denoised = cv2.bilateralFilter(enhanced, 9, 75, 75)
     return denoised
 
-CHAR_TO_DIGIT = {'O': '0', 'D': '0', 'Q': '0', 'I': '1', 'L': '1', 'Z': '2', 'S': '5', 'B': '8'}
-DIGIT_TO_CHAR = {'0': 'O', '1': 'I', '2': 'Z', '5': 'S', '8': 'B'}
 
-def format_plate(raw_text: str):
-    clean = re.sub(r'[^A-Za-z0-9]', '', raw_text).upper()
-    if len(clean) < 4:
-        return None
-    # If 6-10 characters, apply Indian positional heuristics if applicable
-    if 6 <= len(clean) <= 10:
-        chars = list(clean)
-        for i in range(min(2, len(chars))):
-            if chars[i].isdigit() and chars[i] in DIGIT_TO_CHAR:
-                chars[i] = DIGIT_TO_CHAR[chars[i]]
-        for i in range(max(0, len(chars) - 4), len(chars)):
-            if not chars[i].isdigit() and chars[i] in CHAR_TO_DIGIT:
-                chars[i] = CHAR_TO_DIGIT[chars[i]]
-        return "".join(chars)
-    return clean
+def assemble_multiline_plate(ocr_results):
+    if not ocr_results:
+        return "", 0.0
+    valid_items = [
+        item for item in ocr_results
+        if len(item) >= 3 and len(str(item[1]).strip()) > 0 and float(item[2]) >= 0.05
+    ]
+    if not valid_items:
+        valid_items = ocr_results
+
+    def get_centroid_y(bbox):
+        try:
+            return float((bbox[0][1] + bbox[2][1]) / 2.0)
+        except Exception:
+            return 0.0
+
+    sorted_lines = sorted(valid_items, key=lambda it: get_centroid_y(it[0]))
+    cleaned_lines = []
+    confs = []
+
+    for idx, (bbox, text, conf) in enumerate(sorted_lines):
+        raw = str(text).strip()
+        cleaned = re.sub(r'[^A-Za-z0-9\-\. ]', '', raw).strip().upper()
+        if not cleaned:
+            continue
+        if len(sorted_lines) > 1 and idx == 0:
+            cleaned = re.sub(r'([A-Za-z])[Gg]\b', r'\g<1>9', cleaned)
+            cleaned = re.sub(r'([A-Za-z])g', r'\g<1>9', cleaned)
+            cleaned = re.sub(r'\s*-\s*', '-', cleaned)
+            if "-" not in cleaned and len(cleaned) >= 4:
+                cleaned = re.sub(r'\s+', '-', cleaned)
+        elif len(sorted_lines) > 1 and idx == len(sorted_lines) - 1:
+            chars = []
+            for ch in cleaned:
+                if ch in ('O', 'D', 'Q'):
+                    chars.append('0')
+                elif ch in ('I', 'L'):
+                    chars.append('1')
+                elif ch == 'Z':
+                    chars.append('2')
+                elif ch == 'S':
+                    chars.append('5')
+                elif ch == 'B':
+                    chars.append('8')
+                else:
+                    chars.append(ch)
+            cleaned = "".join(chars)
+        cleaned_lines.append(cleaned)
+        confs.append(float(conf))
+
+    full_plate = " ".join(cleaned_lines)
+    mean_conf = float(np.mean(confs)) if confs else 0.0
+    return full_plate, round(mean_conf, 3)
 
 
 # -------------------------------------------------------------------------
@@ -178,6 +229,7 @@ moto_last_seen = {}
 moto_plate_votes = defaultdict(lambda: defaultdict(float))
 moto_resolved_plates = {}
 moto_plate_boxes = {}
+moto_best_plate_cand = {}
 
 # Incidents
 incidents = {}  # inc_id -> dict
@@ -290,8 +342,10 @@ for result in results_gen:
                     "helmet_confidence": round(float(np.mean(no_helmet_obs)), 3),
                     "plate_number": "SCANNING...",
                     "plate_confidence": 0.0,
+                    "plate_clarity": 0.0,
                     "status": "PENDING_PLATE",
                     "snapshot_path": None,
+                    "plate_crop_path": None,
                     "sample_bbox": [px1, py1, px2, py2]
                 }
             else:
@@ -339,49 +393,55 @@ for result in results_gen:
                     cv2.rectangle(orig_frame, (abs_px1, abs_py1), (abs_px2, abs_py2), (0, 255, 255), 2)
 
                     plate_crop = orig_frame[max(0, abs_py1):min(height, abs_py2), max(0, abs_px1):min(width, abs_px2)]
-                    if plate_crop.size > 0 and plate_crop.shape[0] >= 12 and plate_crop.shape[1] >= 25:
-                        # Run OCR on sample frames
+                    if plate_crop.size > 0 and plate_crop.shape[0] >= 12 and plate_crop.shape[1] >= 20:
+                        c_score = compute_crop_clarity(plate_crop)
+                        if m_id not in moto_best_plate_cand or c_score > moto_best_plate_cand[m_id]["clarity"]:
+                            moto_best_plate_cand[m_id] = {
+                                "crop": plate_crop.copy(),
+                                "clarity": c_score,
+                                "bbox": (abs_px1, abs_py1, abs_px2, abs_py2),
+                                "frame_idx": frame_idx
+                            }
+
+                        # Run OCR periodically on best available candidate
                         if frame_idx % 2 == 0:
-                            prep = preprocess_plate(plate_crop)
+                            cand = moto_best_plate_cand[m_id]
+                            prep = enhance_plate_crop(cand["crop"], upscale_factor=2.5)
                             ocr_results = ocr_reader.readtext(
                                 prep,
-                                allowlist='0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-',
+                                allowlist='0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-. ',
                                 detail=1,
                                 paragraph=False
                             )
-                            if ocr_results:
-                                text = "".join([res[1] for res in ocr_results])
-                                ocr_conf = float(np.mean([res[2] for res in ocr_results]))
-                                formatted = format_plate(text)
-                                if formatted:
-                                    moto_plate_votes[m_id][formatted] += ocr_conf
+                            full_plate, ocr_conf = assemble_multiline_plate(ocr_results)
+                            if full_plate and len(full_plate) >= 4:
+                                moto_resolved_plates[m_id] = full_plate
+                                for inc in incidents.values():
+                                    if inc["motorcycle_id"] == m_id:
+                                        inc["plate_number"] = full_plate
+                                        inc["plate_confidence"] = round(float(ocr_conf), 3)
+                                        inc["plate_clarity"] = round(float(cand["clarity"]), 1)
+                                        inc["status"] = "CONFIRMED"
 
-            # Resolve best plate string
-            if m_id in moto_plate_votes and moto_plate_votes[m_id]:
-                best_plate = max(moto_plate_votes[m_id].keys(), key=lambda p: moto_plate_votes[m_id][p])
-                moto_resolved_plates[m_id] = best_plate
+                                        # Save standalone high-clarity plate crop JPG
+                                        plate_snap_name = f"{inc['incident_id']}_plate.jpg"
+                                        plate_snap_path = SNAPSHOTS_DIR / plate_snap_name
+                                        cv2.imwrite(str(plate_snap_path), cand["crop"])
+                                        inc["plate_crop_path"] = f"/static/snapshots/{plate_snap_name}"
 
-                # Update associated incidents
-                for inc in incidents.values():
-                    if inc["motorcycle_id"] == m_id:
-                        inc["plate_number"] = best_plate
-                        inc["plate_confidence"] = round(float(np.mean(list(moto_plate_votes[m_id].values()))), 3)
-                        inc["status"] = "CONFIRMED"
-
-                        # Save violation snapshot image once resolved
-                        if inc["snapshot_path"] is None:
-                            snap_filename = f"{inc['incident_id']}.jpg"
-                            snap_filepath = SNAPSHOTS_DIR / snap_filename
-                            # Extract composite ROI with rider + bike
-                            r_bbox = inc["sample_bbox"]
-                            crop_x1 = max(0, min(r_bbox[0], mx1) - 20)
-                            crop_y1 = max(0, min(r_bbox[1], my1) - 20)
-                            crop_x2 = min(width, max(r_bbox[2], mx2) + 20)
-                            crop_y2 = min(height, max(r_bbox[3], my2) + 20)
-                            snap_crop = orig_frame[crop_y1:crop_y2, crop_x1:crop_x2]
-                            if snap_crop.size > 0:
-                                cv2.imwrite(str(snap_filepath), snap_crop)
-                                inc["snapshot_path"] = f"/static/snapshots/{snap_filename}"
+                                        # Save composite scene evidence if not saved
+                                        if inc["snapshot_path"] is None:
+                                            snap_filename = f"{inc['incident_id']}.jpg"
+                                            snap_filepath = SNAPSHOTS_DIR / snap_filename
+                                            r_bbox = inc["sample_bbox"]
+                                            crop_x1 = max(0, min(r_bbox[0], mx1) - 20)
+                                            crop_y1 = max(0, min(r_bbox[1], my1) - 20)
+                                            crop_x2 = min(width, max(r_bbox[2], mx2) + 20)
+                                            crop_y2 = min(height, max(r_bbox[3], my2) + 20)
+                                            snap_crop = orig_frame[crop_y1:crop_y2, crop_x1:crop_x2]
+                                            if snap_crop.size > 0:
+                                                cv2.imwrite(str(snap_filepath), snap_crop)
+                                                inc["snapshot_path"] = f"/static/snapshots/{snap_filename}"
 
     # Top HUD Banner
     hud_bg = orig_frame[0:52, 0:width].copy()

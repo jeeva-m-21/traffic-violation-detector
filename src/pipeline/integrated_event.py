@@ -27,6 +27,8 @@ class ViolationIncident:
     plate_confidence: float = 0.0
     status: str = "PENDING_PLATE"  # "PENDING_PLATE", "CONFIRMED", "UNRESOLVED_PLATE"
     snapshot_path: Optional[str] = None
+    plate_crop_path: Optional[str] = None
+    plate_clarity: float = 0.0
     sample_bbox: List[int] = field(default_factory=list)
 
     def __post_init__(self) -> None:
@@ -102,6 +104,8 @@ class ViolationEventManager:
         plate_string: str,
         plate_confidence: float,
         snapshot_path: Optional[str] = None,
+        plate_crop_path: Optional[str] = None,
+        plate_clarity: float = 0.0,
     ) -> bool:
         """Attaches an extracted license plate to all pending incidents for a motorcycle."""
         inc_ids = self.moto_to_incidents.get(motorcycle_id, [])
@@ -113,9 +117,12 @@ class ViolationEventManager:
             inc = self.incidents[inc_id]
             inc.plate_number = plate_string
             inc.plate_confidence = round(float(plate_confidence), 3)
+            inc.plate_clarity = round(float(plate_clarity), 2)
             inc.status = "CONFIRMED"
             if snapshot_path:
                 inc.snapshot_path = snapshot_path
+            if plate_crop_path:
+                inc.plate_crop_path = plate_crop_path
             updated = True
 
         return updated

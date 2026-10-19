@@ -56,11 +56,11 @@
 - [x] SPRINT-9.6: End-to-end verification, artifacts audit, and walkthrough update
 
 ## SPRINT-10: High-Clarity Plate Extraction & Multi-Line Full Format OCR
-- [/] SPRINT-10.1: Build clarity evaluator & multi-line plate assembler (`src/anpr/plate_enhancer.py`)
-- [ ] SPRINT-10.2: Unit tests for clarity scoring, upscaling, and multi-line plate reconstruction (`tests/test_plate_enhancer.py`)
-- [ ] SPRINT-10.3: Update integrated event tracker and pipeline runners to buffer candidate plates, export high-clarity plate JPGs, and perform multi-line OCR
-- [ ] SPRINT-10.4: Update Web UI to display standalone high-clarity plate JPGs alongside violation snapshots and show full plate formats
-- [ ] SPRINT-10.5: Local pipeline verification, test suite execution, and walkthrough update
+- [x] SPRINT-10.1: Build clarity evaluator & multi-line plate assembler (`src/anpr/plate_enhancer.py`)
+- [x] SPRINT-10.2: Unit tests for clarity scoring, upscaling, and multi-line plate reconstruction (`tests/test_plate_enhancer.py`)
+- [x] SPRINT-10.3: Update integrated event tracker and pipeline runners to buffer candidate plates, export high-clarity plate JPGs, and perform multi-line OCR
+- [x] SPRINT-10.4: Update Web UI to display standalone high-clarity plate JPGs alongside violation snapshots and show full plate formats
+- [x] SPRINT-10.5: Local pipeline verification, test suite execution, and walkthrough update
 
 
 

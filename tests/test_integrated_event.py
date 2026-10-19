@@ -34,18 +34,22 @@ class TestIntegratedEventEngine(unittest.TestCase):
         self.assertIsNotNone(inc)
         self.assertEqual(len(manager.get_all_incidents()), 1)
 
-        # Later frame reads motorcycle 71's plate: "81-B3 107.25"
+        # Later frame reads motorcycle 71's plate: "81-H9 0737"
         updated = manager.attach_plate(
             motorcycle_id=71,
-            plate_string="81B310725",
+            plate_string="81-H9 0737",
             plate_confidence=0.92,
-            snapshot_path="snapshots/inc_001.jpg"
+            snapshot_path="snapshots/INC-001.jpg",
+            plate_crop_path="snapshots/INC-001_plate.jpg",
+            plate_clarity=191106.6,
         )
         self.assertTrue(updated)
         inc_resolved = manager.get_incident_by_rider(70)
-        self.assertEqual(inc_resolved.plate_number, "81B310725")
+        self.assertEqual(inc_resolved.plate_number, "81-H9 0737")
         self.assertEqual(inc_resolved.status, "CONFIRMED")
         self.assertAlmostEqual(inc_resolved.plate_confidence, 0.92)
+        self.assertEqual(inc_resolved.plate_crop_path, "snapshots/INC-001_plate.jpg")
+        self.assertAlmostEqual(inc_resolved.plate_clarity, 191106.6)
 
     def test_event_manager_duplicate_trigger_idempotency(self):
         manager = ViolationEventManager()

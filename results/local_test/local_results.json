@@ -2,23 +2,27 @@
   "hardware": "13th Gen Intel Core i5-1335U (CPU)",
   "input_video": "/home/jeeva/Downloads/test_clip_5s.mp4",
   "frames_processed": 152,
-  "elapsed_time_sec": 23.18,
-  "fps": 6.56,
+  "elapsed_time_sec": 26.23,
+  "fps": 5.79,
   "violations_detected": 1,
   "violations": [
     {
+      "incident_id": "INC-001",
       "rider_id": 16,
       "motorcycle_id": 23,
       "first_seen_sec": 1.73,
       "violation_type": "NO_HELMET",
-      "plate_number": "01-H9",
+      "plate_number": "91.W9 0737",
+      "plate_confidence": 0.39,
+      "plate_clarity": 744920.0,
+      "snapshot_path": "results/local_test/INC-001.jpg",
+      "plate_crop_path": "results/local_test/INC-001_plate.jpg",
       "sample_bbox": [
         505,
         256,
         732,
         514
-      ],
-      "plate_confidence": 0.611
+      ]
     }
   ]
 }

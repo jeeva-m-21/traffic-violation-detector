@@ -26,8 +26,12 @@ import easyocr
 
 from src.violations.helmet_detector import match_riders_to_motorcycles, extract_head_roi
 from src.violations.helmet_voter import HelmetViolationVoter
-from src.anpr.syntax_validator import clean_ocr_text, format_indian_plate
-from src.anpr.temporal_voter import TemporalPlateVoter
+from src.anpr.plate_enhancer import (
+    PlateCandidateTracker,
+    compute_crop_clarity,
+    enhance_plate_crop,
+    assemble_multiline_plate,
+)
 
 # Optimize CPU threads for 13th Gen Intel Core i5
 threads = min(8, os.cpu_count() or 4)
@@ -69,9 +73,10 @@ writer = cv2.VideoWriter(str(OUTPUT_VIDEO), fourcc, fps, (width, height))
 
 # State
 helmet_voter = HelmetViolationVoter(min_observations=3, violation_threshold=0.5)
-plate_voter = TemporalPlateVoter(min_confidence=0.2)
+plate_tracker = PlateCandidateTracker(min_clarity=20.0)
 confirmed_violations = {}
 moto_plates = {}
+incident_counter = 1
 
 frame_idx = 0
 t_start = time.time()
@@ -147,12 +152,19 @@ for result in results_gen:
 
         if is_viol:
             if p_id not in confirmed_violations:
+                inc_id = f"INC-{incident_counter:03d}"
+                incident_counter += 1
                 confirmed_violations[p_id] = {
+                    "incident_id": inc_id,
                     "rider_id": p_id,
                     "motorcycle_id": moto_id,
                     "first_seen_sec": round(timestamp_sec, 2),
                     "violation_type": "NO_HELMET",
                     "plate_number": "SCANNING...",
+                    "plate_confidence": 0.0,
+                    "plate_clarity": 0.0,
+                    "snapshot_path": None,
+                    "plate_crop_path": None,
                     "sample_bbox": [px1, py1, px2, py2]
                 }
             # Draw red violation box
@@ -190,27 +202,56 @@ for result in results_gen:
                     # Highlight plate
                     cv2.rectangle(frame, (abs_px1, abs_py1), (abs_px2, abs_py2), (0, 255, 255), 2)
 
-                    # Extract plate & run OCR every 3rd frame to conserve CPU
-                    if frame_idx % 3 == 0:
-                        plate_crop = frame[max(0, abs_py1):min(height, abs_py2), max(0, abs_px1):min(width, abs_px2)]
-                        if plate_crop.size > 0 and plate_crop.shape[0] >= 12 and plate_crop.shape[1] >= 25:
-                            gray = cv2.cvtColor(plate_crop, cv2.COLOR_BGR2GRAY)
-                            ocr_res = ocr_reader.readtext(gray, allowlist='0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-', detail=1)
-                            if ocr_res:
-                                text = "".join([r[1] for r in ocr_res])
-                                conf = float(np.mean([r[2] for r in ocr_res]))
-                                cleaned = re.sub(r'[^A-Z0-9-]', '', text.upper())
-                                if len(cleaned) >= 4:
-                                    plate_voter.add_observation(m_id, cleaned, conf)
+                    # Extract plate crop & register candidate in clarity tracker
+                    plate_crop = frame[max(0, abs_py1):min(height, abs_py2), max(0, abs_px1):min(width, abs_px2)]
+                    if plate_crop.size > 0 and plate_crop.shape[0] >= 12 and plate_crop.shape[1] >= 20:
+                        plate_tracker.add_candidate(
+                            track_id=m_id,
+                            crop=plate_crop,
+                            bbox=(abs_px1, abs_py1, abs_px2, abs_py2),
+                            frame_idx=frame_idx,
+                            timestamp_sec=timestamp_sec
+                        )
 
-            # Resolve plate
-            res_plate, plate_conf, _ = plate_voter.resolve_plate(m_id)
-            if res_plate:
-                moto_plates[m_id] = res_plate
-                for v in confirmed_violations.values():
-                    if v["motorcycle_id"] == m_id:
-                        v["plate_number"] = res_plate
-                        v["plate_confidence"] = round(float(plate_conf), 3)
+                        # Run high-clarity OCR periodically on the best available candidate
+                        if frame_idx % 3 == 0:
+                            best_cand = plate_tracker.get_best_candidate(m_id)
+                            if best_cand is not None and best_cand.crop.size > 0:
+                                prep = enhance_plate_crop(best_cand.crop, upscale_factor=2.5)
+                                ocr_res = ocr_reader.readtext(
+                                    prep,
+                                    allowlist='0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-. ',
+                                    detail=1,
+                                    paragraph=False
+                                )
+                                full_plate, ocr_conf = assemble_multiline_plate(ocr_res)
+                                if full_plate and len(full_plate) >= 4:
+                                    moto_plates[m_id] = full_plate
+                                    for v in confirmed_violations.values():
+                                        if v["motorcycle_id"] == m_id:
+                                            v["plate_number"] = full_plate
+                                            v["plate_confidence"] = round(float(ocr_conf), 3)
+                                            v["plate_clarity"] = round(float(best_cand.clarity_score), 1)
+
+                                            # Save standalone high-clarity plate crop JPG
+                                            plate_snap_name = f"{v['incident_id']}_plate.jpg"
+                                            plate_snap_path = OUTPUT_DIR / plate_snap_name
+                                            cv2.imwrite(str(plate_snap_path), best_cand.crop)
+                                            v["plate_crop_path"] = str(plate_snap_path)
+
+                                            # Save composite scene evidence if not saved
+                                            if v["snapshot_path"] is None:
+                                                r_bbox = v["sample_bbox"]
+                                                cx1 = max(0, min(r_bbox[0], mx1) - 20)
+                                                cy1 = max(0, min(r_bbox[1], my1) - 20)
+                                                cx2 = min(width, max(r_bbox[2], mx2) + 20)
+                                                cy2 = min(height, max(r_bbox[3], my2) + 20)
+                                                snap_crop = frame[cy1:cy2, cx1:cx2]
+                                                if snap_crop.size > 0:
+                                                    comp_snap_name = f"{v['incident_id']}.jpg"
+                                                    comp_snap_path = OUTPUT_DIR / comp_snap_name
+                                                    cv2.imwrite(str(comp_snap_path), snap_crop)
+                                                    v["snapshot_path"] = str(comp_snap_path)
 
     # Top HUD Banner
     cv2.rectangle(frame, (0, 0), (width, 40), (20, 20, 20), -1)

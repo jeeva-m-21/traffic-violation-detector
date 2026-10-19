@@ -75,8 +75,10 @@ def load_latest_results() -> Dict[str, Any]:
                 "helmet_confidence": 0.462,
                 "plate_number": "81-H9 0737",
                 "plate_confidence": 0.85,
+                "plate_clarity": 191106.6,
                 "status": "CONFIRMED",
                 "snapshot_path": "/static/snapshots/INC-001.jpg",
+                "plate_crop_path": "/static/snapshots/INC-001_plate.jpg",
                 "sample_bbox": [519, 216, 709, 464]
             },
             {
@@ -89,8 +91,10 @@ def load_latest_results() -> Dict[str, Any]:
                 "helmet_confidence": 0.588,
                 "plate_number": "43-G1 744.95",
                 "plate_confidence": 0.78,
+                "plate_clarity": 98139.4,
                 "status": "CONFIRMED",
                 "snapshot_path": "/static/snapshots/INC-002.jpg",
+                "plate_crop_path": "/static/snapshots/INC-002_plate.jpg",
                 "sample_bbox": [375, 235, 573, 499]
             },
             {
@@ -103,8 +107,10 @@ def load_latest_results() -> Dict[str, Any]:
                 "helmet_confidence": 0.716,
                 "plate_number": "43-G1 136.26",
                 "plate_confidence": 0.91,
+                "plate_clarity": 94165.5,
                 "status": "CONFIRMED",
                 "snapshot_path": "/static/snapshots/INC-003.jpg",
+                "plate_crop_path": "/static/snapshots/INC-003_plate.jpg",
                 "sample_bbox": [1, 293, 213, 519]
             }
         ]
