@@ -1,0 +1,33 @@
+{
+  "video": "plates_raw.mp4",
+  "total_frames": 572,
+  "duration_sec": 38.17,
+  "total_vehicles_tracked": 31,
+  "total_plates_recognized": 3,
+  "vehicles": [
+    {
+      "track_id": 30,
+      "vehicle_type": "Car",
+      "license_plate": "AIE084HHI020512994",
+      "first_seen_sec": 6.21,
+      "last_seen_sec": 38.17,
+      "confidence_score": 0.615
+    },
+    {
+      "track_id": 72,
+      "vehicle_type": "Truck",
+      "license_plate": "4AMARNATH",
+      "first_seen_sec": 12.35,
+      "last_seen_sec": 16.28,
+      "confidence_score": 0.96
+    },
+    {
+      "track_id": 157,
+      "vehicle_type": "Truck",
+      "license_plate": "NE084HH12051",
+      "first_seen_sec": 28.63,
+      "last_seen_sec": 38.17,
+      "confidence_score": 0.466
+    }
+  ]
+}

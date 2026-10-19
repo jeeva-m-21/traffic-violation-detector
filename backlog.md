@@ -21,3 +21,21 @@
 - [x] SPRINT-4.3: Wrong-way motion vector classification & violation alert engine
 - [x] SPRINT-4.4: Render annotated video with trajectory overlays, HUD, and export `violations.json`
 - [x] SPRINT-4.5: Download annotated video and violation log locally, verify Colab session shutdown
+
+## SPRINT-5: License Plate Detection Model Weights & Setup
+- [x] SPRINT-5.1: Integrate specialized YOLO license plate detector (`models/plate_detector.pt`)
+- [x] SPRINT-5.2: Test plate localization on vehicle crops
+- [x] SPRINT-5.3: Automated Colab session management and teardown
+
+## SPRINT-6: OCR Preprocessing & Indian RTO Syntax Validator
+- [x] SPRINT-6.1: Build OpenCV plate crop enhancement module (CLAHE, bilateral filter, Otsu)
+- [x] SPRINT-6.2: Build EasyOCR recognition wrapper with alphanumeric whitelist
+- [x] SPRINT-6.3: Implement Indian RTO regex validator and positional confusion matrix (`src/anpr/syntax_validator.py`)
+- [x] SPRINT-6.4: Unit test OCR parser (`tests/test_syntax_validator.py`)
+
+## SPRINT-7: End-to-End ANPR Video Pipeline on plates_raw.mp4
+- [x] SPRINT-7.1: Build cascaded Vehicle + Plate tracking pipeline (`run_anpr_pipeline.py`)
+- [x] SPRINT-7.2: Multi-frame temporal voting per vehicle track ID (`src/anpr/temporal_voter.py`)
+- [x] SPRINT-7.3: Render annotated video `plates_annotated.mp4` with on-screen plate tags and HUD
+- [x] SPRINT-7.4: Export audit log `results/plates/detected_plates.json`
+- [x] SPRINT-7.5: Execute on Colab GPU with verified session shutdown (`orchestrate_anpr.py`)
