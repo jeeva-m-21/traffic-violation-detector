@@ -28,6 +28,7 @@ cache/
 .DS_Store
 .env
 .env.*
+!.env.example
 *.log
 .playwright-mcp/
 uploads/
