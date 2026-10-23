@@ -104,13 +104,15 @@ cp .env.example .env
 
 ### 3. Run Unit Tests
 ```bash
-python -m unittest discover tests
+python cli.py test
+# or: python -m unittest discover tests
 ```
 *Expected: 36/36 tests passing covering plate enhancer, syntax validator, wrong-way kinematics, helmet detector, and API.*
 
 ### 4. Launch the Web Dashboard
 ```bash
-uvicorn app:app --host 0.0.0.0 --port 8000 --reload
+python cli.py web --reload
+# or: uvicorn app:app --host 0.0.0.0 --port 8000 --reload
 ```
 Navigate to `http://localhost:8000` in your browser.
 
@@ -118,28 +120,41 @@ Navigate to `http://localhost:8000` in your browser.
 
 ## 🧪 CLI Pipelines & Inference
 
+All pipelines can be run conveniently via the top-level `cli.py` runner or directly via `scripts/`:
+
 ### Local End-to-End Inference Runner
-Run the CPU-optimized inference pipeline on any test video:
+Run the CPU-optimized inference pipeline on test video:
 ```bash
-python run_local_inference.py
+python cli.py local
+# or: python scripts/pipelines/run_local_inference.py
 ```
 
-### Integrated Violation & ANPR Pipeline
-Process input video and generate full audit reports and snapshots:
+### Video Enforcement Pipelines
+Execute dedicated video processing pipelines:
 ```bash
-python run_integrated_pipeline.py
+# Integrated Helmet + ANPR pipeline
+python cli.py pipeline integrated
+# or: python scripts/pipelines/run_integrated_pipeline.py
+
+# Helmet violation detection only
+python cli.py pipeline helmet
+# or: python scripts/pipelines/run_helmet_pipeline.py
+
+# ANPR and license plate recognition only
+python cli.py pipeline anpr
+# or: python scripts/pipelines/run_anpr_pipeline.py
+
+# Road-aware wrong-way driving detection only
+python cli.py pipeline wrongway
+# or: python scripts/pipelines/run_violation_pipeline.py
 ```
 
-### Run Specialized Sub-Pipelines
+### Remote Cloud / Colab GPU Orchestrators
 ```bash
-# Helmet violation detection
-python run_helmet_pipeline.py
-
-# ANPR and license plate recognition
-python run_anpr_pipeline.py
-
-# Wrong-way driving detection
-python run_violation_pipeline.py
+# Orchestrate full pipeline on remote GPU with automated VM teardown
+python cli.py orchestrate integrated
+python cli.py orchestrate wrongway
+python cli.py orchestrate plate-training
 ```
 
 ---
@@ -163,13 +178,34 @@ python run_violation_pipeline.py
 
 ```
 ├── app.py                      # FastAPI web server and REST API
+├── cli.py                      # Unified command-line interface
 ├── PRD.md                      # Product Requirements & Engineering Spec
 ├── backlog.md                  # Sprint tracker and backlog items
 ├── requirements.txt            # Python dependencies
 ├── .env.example                # Example environment configuration
 ├── config/
 │   └── settings.json           # Runtime thresholds and configurations
-├── src/
+├── notebooks/                  # Interactive Colab / Jupyter research notebooks
+│   └── traffic_violation_m1.ipynb
+├── scripts/                    # CLI execution and orchestration scripts
+│   ├── pipelines/              # Video detection and inference pipelines
+│   │   ├── run_integrated_pipeline.py
+│   │   ├── run_local_inference.py
+│   │   ├── run_helmet_pipeline.py
+│   │   ├── run_anpr_pipeline.py
+│   │   └── run_violation_pipeline.py
+│   ├── orchestration/          # Automated remote Colab GPU lifecycle orchestrators
+│   │   ├── orchestrate_integrated.py
+│   │   ├── orchestrate_helmet.py
+│   │   ├── orchestrate_anpr.py
+│   │   ├── orchestrate_violation.py
+│   │   └── orchestrate_plate_training.py
+│   └── benchmarks/             # Dataset sampling, model training, and evaluations
+│       ├── train_plate_detector.py
+│       ├── step1_fetch_and_sample.py
+│       ├── step2_run_models_and_eval.py
+│       └── generate_notebook.py
+├── src/                        # Core modular Python package
 │   ├── anpr/                   # Plate enhancement, multi-line OCR, RTO syntax
 │   ├── violations/             # Helmet detection, wrong-way kinematics, road segmenter
 │   └── pipeline/               # Integrated violation-to-plate event engine
@@ -177,7 +213,7 @@ python run_violation_pipeline.py
 │   └── index.html              # Modern dark-mode dashboard interface
 ├── static/                     # Evidence snapshots, CSS assets, preview images
 ├── tests/                      # Automated test suite (36 unit tests)
-├── results/                    # Validation benchmarks, reports, and JSON audits
+└── results/                    # Validation benchmarks, reports, and JSON audits
 └── run_*.py                    # Pipeline execution scripts
 ```
 

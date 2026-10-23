@@ -4,13 +4,14 @@ import os
 import glob
 from pathlib import Path
 
+ROOT_DIR = Path(__file__).resolve().parents[2]
 COLAB_BIN = "/home/jeeva/.local/bin/colab"
 SESSION_NAME = "plate-train"
 LOCAL_DATASET = "/home/jeeva/Downloads/Indian number plate.v2i.yolov8.zip"
-SCRIPT_FILE = "train_plate_detector.py"
-OUTPUT_DIR = Path("results/plates")
+SCRIPT_FILE = str(ROOT_DIR / "scripts" / "benchmarks" / "train_plate_detector.py")
+OUTPUT_DIR = ROOT_DIR / "results" / "plates"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-Path("models").mkdir(parents=True, exist_ok=True)
+(ROOT_DIR / "models").mkdir(parents=True, exist_ok=True)
 
 def run_colab_cmd(args, timeout=900):
     cmd = [COLAB_BIN] + args

@@ -3,12 +3,13 @@ import sys
 import os
 from pathlib import Path
 
+ROOT_DIR = Path(__file__).resolve().parents[2]
 COLAB_BIN = "/home/jeeva/.local/bin/colab"
 SESSION_NAME = "traffic-v1"
 LOCAL_VIDEO = "/home/jeeva/Downloads/wrongway_motion_raw.mp4"
 REMOTE_VIDEO = "/content/wrongway_motion_raw.mp4"
-SCRIPT_FILE = "run_violation_pipeline.py"
-OUTPUT_DIR = Path("results/violations")
+SCRIPT_FILE = str(ROOT_DIR / "scripts" / "pipelines" / "run_violation_pipeline.py")
+OUTPUT_DIR = ROOT_DIR / "results" / "violations"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 def run_colab_cmd(args, timeout=600):

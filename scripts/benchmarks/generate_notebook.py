@@ -412,6 +412,11 @@ notebook = {
  "nbformat_minor": 0
 }
 
-with open("/home/jeeva/projects/zevaras/traffic-violation detector/traffic_violation_m1.ipynb", "w") as f:
+from pathlib import Path
+
+ROOT_DIR = Path(__file__).resolve().parents[2]
+out_path = ROOT_DIR / "notebooks" / "traffic_violation_m1.ipynb"
+out_path.parent.mkdir(parents=True, exist_ok=True)
+with open(out_path, "w") as f:
     json.dump(notebook, f, indent=1)
-print("Notebook traffic_violation_m1.ipynb regenerated successfully!")
+print(f"Notebook {out_path.name} regenerated successfully in notebooks/!")

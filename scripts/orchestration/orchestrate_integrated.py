@@ -10,19 +10,20 @@ import os
 import shutil
 from pathlib import Path
 
+ROOT_DIR = Path(__file__).resolve().parents[2]
 COLAB_BIN = "/home/jeeva/.local/bin/colab"
 SESSION_NAME = "traffic-integrated"
 LOCAL_VIDEO = "/home/jeeva/Downloads/helmet_riders_clean.mp4"
 REMOTE_VIDEO = "/content/helmet_riders_clean.mp4"
-SCRIPT_FILE = "run_integrated_pipeline.py"
+SCRIPT_FILE = str(ROOT_DIR / "scripts" / "pipelines" / "run_integrated_pipeline.py")
 
-OUTPUT_DIR = Path("results/integrated")
+OUTPUT_DIR = ROOT_DIR / "results" / "integrated"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 SNAPSHOTS_DIR = OUTPUT_DIR / "snapshots"
 SNAPSHOTS_DIR.mkdir(parents=True, exist_ok=True)
 
 # Also ensure static snapshots for web frontend
-STATIC_SNAPSHOTS_DIR = Path("static/snapshots")
+STATIC_SNAPSHOTS_DIR = ROOT_DIR / "static" / "snapshots"
 STATIC_SNAPSHOTS_DIR.mkdir(parents=True, exist_ok=True)
 
 def run_colab_cmd(args, timeout=600):
@@ -77,7 +78,7 @@ def main():
                 print(f"[ORCHESTRATOR] Note on {inc_id} snapshot: {e}")
 
         # Also copy video to static for web app playback
-        shutil.copy(str(OUTPUT_DIR / "integrated_annotated.mp4"), "static/integrated_annotated.mp4")
+        shutil.copy(str(OUTPUT_DIR / "integrated_annotated.mp4"), str(ROOT_DIR / "static" / "integrated_annotated.mp4"))
 
         print("\n=== All Integrated Artifacts Saved to results/integrated/ & static/ ===")
 

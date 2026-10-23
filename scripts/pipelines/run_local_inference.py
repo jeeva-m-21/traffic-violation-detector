@@ -24,6 +24,10 @@ import torch
 from ultralytics import YOLO
 import easyocr
 
+ROOT_DIR = Path(__file__).resolve().parents[2]
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
+
 from src.violations.helmet_detector import match_riders_to_motorcycles, extract_head_roi
 from src.violations.helmet_voter import HelmetViolationVoter
 from src.anpr.plate_enhancer import (
@@ -41,19 +45,25 @@ print(f"Host CPU: 13th Gen Intel Core i5 | PyTorch CPU Threads: {threads}")
 print(f"CUDA Available: {torch.cuda.is_available()} (Running strictly on local CPU hardware)")
 
 INPUT_VIDEO = sys.argv[1] if len(sys.argv) > 1 else "/home/jeeva/Downloads/test_clip_5s.mp4"
-OUTPUT_DIR = Path("results/local_test")
+OUTPUT_DIR = ROOT_DIR / "results" / "local_test"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 OUTPUT_VIDEO = OUTPUT_DIR / "local_annotated.mp4"
 OUTPUT_JSON = OUTPUT_DIR / "local_results.json"
 
+MODEL_VEH_PATH = ROOT_DIR / "models" / "yolo11s.pt"
+MODEL_HELMET_PATH = ROOT_DIR / "models" / "helmet_detector.pt"
+MODEL_PLATE_PATH = ROOT_DIR / "models" / "plate_detector.pt"
+
 assert os.path.exists(INPUT_VIDEO), f"Input video missing: {INPUT_VIDEO}"
-assert os.path.exists("models/yolo11s.pt"), "models/yolo11s.pt missing"
-assert os.path.exists("models/helmet_detector.pt"), "models/helmet_detector.pt missing"
-assert os.path.exists("models/plate_detector.pt"), "models/plate_detector.pt missing"
+assert MODEL_VEH_PATH.exists(), f"{MODEL_VEH_PATH} missing"
+assert MODEL_HELMET_PATH.exists(), f"{MODEL_HELMET_PATH} missing"
+assert MODEL_PLATE_PATH.exists(), f"{MODEL_PLATE_PATH} missing"
 
 print("\n--- Step 1: Loading Neural Models & OCR Engine into CPU Memory ---")
 t_load_start = time.time()
-model_veh = YOLO("models/yolo11s.pt")
+model_veh = YOLO(str(MODEL_VEH_PATH))
+model_helmet = YOLO(str(MODEL_HELMET_PATH))
+model_plate = YOLO(str(MODEL_PLATE_PATH))
 model_helmet = YOLO("models/helmet_detector.pt")
 model_plate = YOLO("models/plate_detector.pt")
 ocr_reader = easyocr.Reader(['en'], gpu=False, verbose=False)

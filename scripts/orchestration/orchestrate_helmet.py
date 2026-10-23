@@ -3,14 +3,15 @@ import sys
 import os
 from pathlib import Path
 
+ROOT_DIR = Path(__file__).resolve().parents[2]
 COLAB_BIN = "/home/jeeva/.local/bin/colab"
 SESSION_NAME = "helmet-v1"
 LOCAL_VIDEO = "/home/jeeva/Downloads/helmet_riders_clean.mp4"
 REMOTE_VIDEO = "/content/helmet_riders_clean.mp4"
-LOCAL_HELMET_MODEL = "models/helmet_detector.pt"
+LOCAL_HELMET_MODEL = str(ROOT_DIR / "models" / "helmet_detector.pt")
 REMOTE_HELMET_MODEL = "/content/helmet_detector.pt"
-SCRIPT_FILE = "run_helmet_pipeline.py"
-OUTPUT_DIR = Path("results/violations")
+SCRIPT_FILE = str(ROOT_DIR / "scripts" / "pipelines" / "run_helmet_pipeline.py")
+OUTPUT_DIR = ROOT_DIR / "results" / "violations"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 def run_colab_cmd(args, timeout=600):

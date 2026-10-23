@@ -3,12 +3,13 @@ import sys
 import os
 from pathlib import Path
 
+ROOT_DIR = Path(__file__).resolve().parents[2]
 COLAB_BIN = "/home/jeeva/.local/bin/colab"
 SESSION_NAME = "plate-anpr"
 LOCAL_VIDEO = "/home/jeeva/Downloads/plates_raw.mp4"
 REMOTE_VIDEO = "/content/plates_raw.mp4"
-SCRIPT_FILE = "run_anpr_pipeline.py"
-OUTPUT_DIR = Path("results/plates")
+SCRIPT_FILE = str(ROOT_DIR / "scripts" / "pipelines" / "run_anpr_pipeline.py")
+OUTPUT_DIR = ROOT_DIR / "results" / "plates"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 def run_colab_cmd(args, timeout=600):
